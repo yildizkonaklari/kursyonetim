@@ -9,9 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <!-- PDF Türkçe Karakter Desteği İçin Font Dosyası -->
     <script src="https://raw.githack.com/MrRio/jsPDF/master/examples/fonts/LiberationSans-Regular-normal.js"></script>
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Custom Stiller ve Animasyonlar */
@@ -90,13 +88,11 @@
 </head>
 <body class="bg-gray-100">
 
-    <!-- Yükleme Ekranı -->
     <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
         <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
     </div>
 
 
-    <!-- Firebase Giriş Ekranı -->
     <div id="login-screen" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 hidden">
         <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-sm">
             <h2 id="form-title" class="text-2xl font-bold text-center text-gray-800 mb-6">Yönetici Girişi</h2>
@@ -119,13 +115,10 @@
     </div>
 
 
-    <!-- Ana Uygulama Arayüzü -->
     <div id="app" class="hidden relative min-h-screen md:flex">
         
-        <!-- Mobile Menu Overlay -->
         <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
 
-        <!-- Kenar Çubuğu (Sidebar) -->
         <aside id="sidebar" class="bg-gray-800 text-white w-64 flex-shrink-0 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-300 ease-in-out z-30 flex flex-col">
             <div class="h-16 flex items-center justify-center text-2xl font-bold border-b border-gray-700 flex-shrink-0 px-4">
                 <i class="fas fa-palette mr-3"></i> 
@@ -140,6 +133,9 @@
                 </a>
                 <a href="#courses" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-book w-6 text-center sidebar-icon"></i><span class="ml-3">Kurslar</span>
+                </a>
+                <a href="#rooms" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
+                    <i class="fas fa-door-open w-6 text-center sidebar-icon"></i><span class="ml-3">Odalar</span>
                 </a>
                 <a href="#payments" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-lira-sign w-6 text-center sidebar-icon"></i><span class="ml-3">Ödemeler</span>
@@ -161,20 +157,15 @@
             </div>
         </aside>
 
-        <!-- Ana Konteyner -->
         <div class="flex-1 flex flex-col">
-            <!-- Mobil Üst Bar -->
             <header class="md:hidden flex justify-between items-center bg-white p-4 shadow-md">
                 <button id="menu-btn" class="text-gray-700 focus:outline-none">
                     <i class="fas fa-bars fa-lg"></i>
                 </button>
                 <h1 class="text-xl font-bold text-gray-800">Alegori Sanat Evi</h1>
-                <div class="w-8"></div> <!-- Spacer to balance the button -->
-            </header>
+                <div class="w-8"></div> </header>
 
-            <!-- Ana İçerik -->
             <main class="flex-1 p-6 md:p-10 overflow-y-auto">
-                <!-- Sayfa: Ana Sayfa / Dashboard -->
                 <div id="dashboard-page" class="page">
                     <h1 class="text-3xl font-bold text-gray-800 mb-6">Hoş Geldiniz!</h1>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -209,11 +200,9 @@
                     </div>
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">Aktif Kurslar</h2>
                     <div id="dashboard-courses-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Kurs kartları JS ile eklenecek -->
-                    </div>
+                        </div>
                 </div>
 
-                <!-- Sayfa: Öğrenciler -->
                 <div id="students-page" class="page">
                     <div class="flex justify-between items-center mb-6">
                         <h1 class="text-3xl font-bold text-gray-800">Öğrenci Yönetimi</h1>
@@ -226,7 +215,6 @@
                             </button>
                         </div>
                     </div>
-                    <!-- Arama ve Filtreleme -->
                     <div class="bg-white p-4 rounded-lg shadow-md mb-6 flex flex-col md:flex-row gap-4">
                         <input type="text" id="student-search" placeholder="Öğrenci adıyla ara..." class="flex-grow p-2 border rounded-md">
                         <select id="student-course-filter" class="p-2 border rounded-md">
@@ -250,18 +238,17 @@
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Ad Soyad (Katılım)</th>
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Kurs</th>
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Ders Günü/Saati</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Oda</th>
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Bakiye</th>
                                     <th class="p-4 text-center text-sm font-semibold text-gray-600">İşlemler</th>
                                 </tr>
                             </thead>
                             <tbody id="students-table-body">
-                                <!-- Öğrenci listesi JS ile eklenecek -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Sayfa: Kurslar -->
                 <div id="courses-page" class="page">
                      <div class="flex justify-between items-center mb-6">
                         <h1 class="text-3xl font-bold text-gray-800">Kurs Yönetimi</h1>
@@ -282,13 +269,32 @@
                                 </tr>
                             </thead>
                             <tbody id="courses-table-body">
-                                <!-- Kurs listesi JS ile eklenecek -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
-
-                <!-- Sayfa: Ödemeler -->
+                
+                <div id="rooms-page" class="page">
+                     <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-bold text-gray-800">Oda Yönetimi</h1>
+                        <button id="add-room-btn" class="bg-blue-600 text-white p-2 md:px-4 md:py-2 rounded-lg shadow hover:bg-blue-700 flex items-center">
+                            <i class="fas fa-plus md:mr-2"></i> <span class="hidden md:inline">Yeni Oda Ekle</span>
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+                         <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Oda Adı</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Kapasite (Kişi)</th>
+                                    <th class="p-4 text-center text-sm font-semibold text-gray-600">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rooms-table-body">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
                 <div id="payments-page" class="page">
                     <h1 class="text-3xl font-bold text-gray-800 mb-6">Ödeme Takibi</h1>
                     <div class="bg-white p-4 rounded-lg shadow-md mb-6 flex flex-col md:flex-row gap-4">
@@ -314,13 +320,11 @@
                                 </tr>
                             </thead>
                             <tbody id="payments-table-body">
-                                <!-- Ödeme listesi JS ile eklenecek -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Sayfa: Ders Programı / Takvim -->
                 <div id="calendar-page" class="page">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <h1 class="text-3xl font-bold text-gray-800">Ders Programı</h1>
@@ -330,25 +334,29 @@
                              <button id="next-week-btn" title="Sonraki Hafta" class="p-2 rounded-md bg-white shadow-sm hover:bg-gray-100"><i class="fas fa-chevron-right"></i></button>
                              <button id="today-btn" class="px-3 py-2 text-sm bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700">Bugün</button>
                         </div>
-                        <div class="w-full md:w-64">
-                            <select id="calendar-course-filter" class="p-2 border rounded-md w-full"></select>
+                        <div class="flex items-center gap-4">
+                            <select id="calendar-course-filter" class="p-2 border rounded-md w-full md:w-48"></select>
+                            <button id="calendar-view-toggle" data-view="course" class="px-3 py-2 text-sm bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 whitespace-nowrap">
+                                Oda Bazlı Göster
+                            </button>
                        </div>
                     </div>
-                    <div class="bg-white p-2 rounded-lg shadow-md overflow-x-auto">
-                        <div id="calendar-grid" class="grid" style="min-width: 800px;">
-                            <!-- Saatler ve Günler JS ile doldurulacak -->
+                    
+                    <div id="calendar-view-course">
+                        <div class="bg-white p-2 rounded-lg shadow-md overflow-x-auto">
+                            <div id="calendar-grid" class="grid" style="min-width: 800px;">
+                                </div>
                         </div>
                     </div>
+                    
+                    <div id="calendar-view-room" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        </div>
                 </div>
-                
-                <!-- Sayfa: Raporlar -->
                 <div id="reports-page" class="page">
                     <h1 class="text-3xl font-bold text-gray-800 mb-6">Raporlama</h1>
                     
-                    <!-- Finansal Raporlar -->
                     <section class="bg-white p-6 rounded-lg shadow-md mb-8">
                         <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">Finansal Raporlar</h2>
-                        <!-- Date Filters -->
                         <div class="flex flex-col md:flex-row gap-4 mb-4">
                             <div>
                                 <label for="report-start-date" class="block text-sm font-medium text-gray-700">Başlangıç Tarihi</label>
@@ -363,7 +371,6 @@
                                 <i class="fas fa-file-pdf mr-2"></i> PDF İndir
                             </button>
                         </div>
-                        <!-- Summary Cards -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div class="bg-green-100 p-4 rounded-lg">
                                 <p class="text-sm text-green-800">Toplam Gelir (Seçili Aralık)</p>
@@ -374,7 +381,6 @@
                                 <p id="report-total-due" class="text-3xl font-bold text-red-900">0 ₺</p>
                             </div>
                         </div>
-                        <!-- Revenue by Course Table -->
                         <h3 class="text-xl font-semibold text-gray-600 mb-2">Kursa Göre Gelir Dağılımı (Seçili Aralık)</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full">
@@ -385,23 +391,18 @@
                                     </tr>
                                 </thead>
                                 <tbody id="report-revenue-by-course-body">
-                                    <!-- JS ile doldurulacak -->
-                                </tbody>
+                                    </tbody>
                             </table>
                         </div>
                     </section>
 
-                    <!-- Öğrenci ve Operasyonel Raporlar -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Öğrenci Raporları -->
                         <section class="bg-white p-6 rounded-lg shadow-md">
                             <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">Öğrenci Raporları</h2>
-                            <!-- New Students Chart -->
                             <h3 class="text-xl font-semibold text-gray-600 mb-2">Aylara Göre Yeni Öğrenci Kayıtları</h3>
                             <div class="mb-6">
                                 <canvas id="new-students-chart"></canvas>
                             </div>
-                            <!-- Absenteeism Table -->
                             <h3 class="text-xl font-semibold text-gray-600 mb-2">En Çok Devamsızlık Yapanlar (Tüm Zamanlar)</h3>
                             <div class="overflow-y-auto max-h-60">
                                  <table class="w-full">
@@ -412,16 +413,13 @@
                                         </tr>
                                     </thead>
                                     <tbody id="report-absenteeism-body">
-                                        <!-- JS ile doldurulacak -->
-                                    </tbody>
+                                        </tbody>
                                 </table>
                             </div>
                         </section>
 
-                        <!-- Operasyonel Raporlar -->
                         <section class="bg-white p-6 rounded-lg shadow-md">
                             <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">Operasyonel Raporlar</h2>
-                            <!-- Course Popularity -->
                             <h3 class="text-xl font-semibold text-gray-600 mb-2">Kurs Popülerlik Raporu (Aktif Öğrenci)</h3>
                             <div class="overflow-y-auto max-h-60 mb-6">
                                  <table class="w-full">
@@ -432,11 +430,9 @@
                                         </tr>
                                     </thead>
                                     <tbody id="report-course-popularity-body">
-                                        <!-- JS ile doldurulacak -->
-                                    </tbody>
+                                        </tbody>
                                 </table>
                             </div>
-                            <!-- Instructor Workload -->
                             <h3 class="text-xl font-semibold text-gray-600 mb-2">Eğitmen Ders Yükü (Aktif Öğrenci)</h3>
                             <div class="overflow-y-auto max-h-60">
                                  <table class="w-full">
@@ -447,15 +443,13 @@
                                         </tr>
                                     </thead>
                                     <tbody id="report-instructor-workload-body">
-                                        <!-- JS ile doldurulacak -->
-                                    </tbody>
+                                        </tbody>
                                 </table>
                             </div>
                         </section>
                     </div>
                 </div>
 
-                <!-- Sayfa: Nasıl Kullanılır? -->
                 <div id="how-to-use-page" class="page">
                     <div class="bg-white p-8 rounded-lg shadow-md">
                         <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">Kullanım Kılavuzu</h1>
@@ -473,6 +467,7 @@
                                         <li><strong>Kurs Seçimi:</strong> Öğrencinin kayıt olacağı kursu listeden seçin.</li>
                                         <li><strong>Dönem Ücreti ve Ders Sayısı:</strong> Öğrenciden alacağınız ücreti ve bu ücretin kaç dersi kapsadığını belirtin (Örn: 400 TL, 4 ders).</li>
                                         <li><strong>Ders Günü ve Saati:</strong> Öğrencinin sabit ders programını belirleyin.</li>
+                                        <li><strong>Oda:</strong> (Yeni) Dersin yapılacağı odayı seçin. Sistem, o odanın kapasitesi ve programına göre çakışmaları engelleyecektir.</li>
                                     </ul>
                                 </li>
                                 <li><strong class="text-indigo-600">"Kaydet"</strong> butonuna basın. Kayıtla birlikte öğrencinin bakiyesine belirlediğiniz dönem ücreti borç olarak yansıtılacaktır.</li>
@@ -492,9 +487,16 @@
                                 <li><strong>Düzenleme ve Silme:</strong> Listeden bir kursu güncelleyebilir veya silebilirsiniz. <strong class="text-red-600">Not:</strong> Bir kursu silmek, o kursa kayıtlı tüm öğrencileri de kalıcı olarak silecektir.</li>
                             </ul>
                         </section>
-
+                        
                         <section class="mb-8">
-                            <h2 class="text-2xl font-bold text-gray-700 mb-4">3. Ödeme Takibi</h2>
+                            <h2 class="text-2xl font-bold text-gray-700 mb-4">3. Oda Yönetimi</h2>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>Fiziksel odalarınızı (Atölye 1, Müzik Odası vb.) ve bu odaların maksimum öğrenci kapasitesini buradan tanımlayın.</li>
+                                <li>Bir odayı silmek için, o odaya atanmış aktif bir öğrenci olmamalıdır.</li>
+                            </ul>
+                        </section>
+                        <section class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-700 mb-4">4. Ödeme Takibi</h2>
                             <ul class="list-disc list-inside space-y-2">
                                 <li><strong>Filtreleme:</strong> Öğrencileri isme, kursa veya ödeme durumuna ("Borçlu" / "Borcu Yok") göre listeleyebilirsiniz.</li>
                                 <li><strong>Ödeme Ekleme:</strong> Bir öğrencinin satırındaki <strong class="text-yellow-600">"Ödeme Ekle"</strong> butonuna tıklayın. Açılan pencerede alınan ödeme tutarını girip kaydedin. Tutar, öğrencinin bakiyesinden otomatik olarak düşülecektir.</li>
@@ -502,10 +504,15 @@
                         </section>
 
                         <section>
-                            <h2 class="text-2xl font-bold text-gray-700 mb-4">4. Ders Programı (Takvim)</h2>
+                            <h2 class="text-2xl font-bold text-gray-700 mb-4">5. Ders Programı (Takvim)</h2>
                             <ul class="list-disc list-inside space-y-2">
                                 <li><strong>Haftalık Gezinme:</strong> Takvimin üstündeki okları ve "Bugün" butonunu kullanarak haftalar arasında gezinebilirsiniz.</li>
-                                <li><strong>Filtreleme:</strong> Sağ üstteki seçim kutusundan bir kurs seçerek sadece o kursa ait dersleri takvimde görebilirsiniz.</li>
+                                <li><strong>Görünüm Değiştirme:</strong> Sağ üstteki <strong class="text-blue-600">"Oda Bazlı Göster"</strong> / <strong class="text-green-600">"Kurs Bazlı Göster"</strong> butonu ile takvim görünümünü değiştirebilirsiniz.
+                                    <ul class="list-disc list-inside ml-4 mt-1">
+                                        <li><strong>Kurs Bazlı:</strong> Tüm dersleri tek bir takvimde, kursa göre filtrelenebilir şekilde gösterir.</li>
+                                        <li><strong>Oda Bazlı:</strong> Her bir oda için ayrı bir haftalık takvim oluşturur, böylece odaların doluluğunu bir bakışta görebilirsiniz.</li>
+                                    </ul>
+                                </li>
                                 <li><strong>Hızlı İşlem:</strong> Takvimdeki bir derse tıkladığınızda, ilgili öğrencinin devam durumunu ("Geldi", "Gelmedi") işleyebileceğiniz pencere açılır.</li>
                             </ul>
                         </section>
@@ -518,20 +525,15 @@
         </div>
     </div>
     
-    <!-- Modal (Dinamik İçerik için) -->
     <div id="modal" class="fixed inset-0 z-40 hidden overflow-y-auto">
         <div class="modal-backdrop fixed inset-0"></div>
         <div class="flex items-start justify-center min-h-screen p-4 pt-10 text-center">
             <div id="modal-content" class="modal-content bg-white p-6 rounded-lg shadow-xl w-full max-w-lg text-left transform transition-all">
-                <!-- Modal içeriği JS ile doldurulacak -->
-            </div>
+                </div>
         </div>
     </div>
 
-    <!-- Yazdırma Alanı (Görünmez) -->
     <div id="print-area" class="hidden"></div>
-
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -539,12 +541,12 @@
 <script type="module">
     // --- Firebase Proje Ayarları Netlify tarafından güvenli bir şekilde eklenecek ---
     const firebaseConfig = {
-  apiKey: "AIzaSyAh2z7aQRYKfJSjRgiakOj_w8bDZp0crMI",
-  authDomain: "kursyonetim-f6ebc.firebaseapp.com",
-  projectId: "kursyonetim-f6ebc",
-  storageBucket: "kursyonetim-f6ebc.firebasestorage.app",
-  messagingSenderId: "790815335813",
-  appId: "1:790815335813:web:08fa5776ba8d87d5dfd0ec"
+      apiKey: "AIzaSyAh2z7aQRYKfJSjRgiakOj_w8bDZp0crMI",
+      authDomain: "kursyonetim-f6ebc.firebaseapp.com",
+      projectId: "kursyonetim-f6ebc",
+      storageBucket: "kursyonetim-f6ebc.firebasestorage.app",
+      messagingSenderId: "790815335813",
+      appId: "1:790815335813:web:08fa5776ba8d87d5dfd0ec"
     };
 
     // Firebase'i başlat
@@ -556,7 +558,8 @@
         // --- STATE YÖNETİMİ ---
         let state = {
             students: [],
-            courses: []
+            courses: [],
+            rooms: [] // YENİ
         };
 
         let viewDate = new Date();
@@ -620,6 +623,17 @@
                 loadingOverlay.classList.add('hidden');
             });
 
+            // YENİ: Odaları dinle
+            db.collection('rooms').onSnapshot(snapshot => {
+                state.rooms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateAllSelects(); // Odalar değiştiğinde de filtreleri/formları güncelle
+                renderAllPages();
+                loadingOverlay.classList.add('hidden');
+            }, error => {
+                console.error("Oda verisi alınamadı: ", error);
+                loadingOverlay.classList.add('hidden');
+            });
+
             // Öğrencileri dinle
             db.collection('students').onSnapshot(snapshot => {
                 state.students = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -659,6 +673,7 @@
                 case 'dashboard': renderDashboard(); break;
                 case 'students': renderStudentsPage(); break;
                 case 'courses': renderCoursesPage(); break;
+                case 'rooms': renderRoomsPage(); break; // YENİ
                 case 'payments': renderPaymentsPage(); break;
                 case 'calendar': renderCalendar(); break;
                 case 'reports': renderReportsPage(); break;
@@ -739,6 +754,7 @@
 
             filteredStudents.forEach(student => {
                 const course = state.courses.find(c => c.id === student.courseId);
+                const room = state.rooms.find(r => r.id === student.roomId); // YENİ: Odayı bul
                 const balance = (student.payments || []).reduce((sum, p) => sum + p.amount, 0);
                 const attendedCount = (student.attendance || []).filter(a => a.status === 'geldi').length % (student.lessonsPerFee || 1);
                 const isInactive = student.status === 'inactive';
@@ -751,7 +767,7 @@
                         </td>
                         <td class="p-4">${course ? course.name : 'Kurs Bulunamadı'}</td>
                         <td class="p-4">${student.day} / ${student.time}</td>
-                        <td class="p-4 font-semibold ${balance < 0 ? 'text-red-600' : 'text-green-600'}">${balance.toFixed(2)} ₺</td>
+                        <td class="p-4">${room ? room.name : 'N/A'}</td> <td class="p-4 font-semibold ${balance < 0 ? 'text-red-600' : 'text-green-600'}">${balance.toFixed(2)} ₺</td>
                         <td class="p-4 text-center">
                             <button class="edit-student-btn text-blue-500 hover:text-blue-700 mr-2" data-id="${student.id}" title="Düzenle"><i class="fas fa-edit"></i></button>
                             <button class="delete-student-btn text-red-500 hover:text-red-700 mr-2" data-id="${student.id}" title="Sil"><i class="fas fa-trash"></i></button>
@@ -828,6 +844,25 @@
             });
         }
         
+        // YENİ: Odalar sayfasını render et
+        function renderRoomsPage() {
+            const tableBody = document.getElementById('rooms-table-body');
+            tableBody.innerHTML = '';
+            state.rooms.forEach(room => {
+                const row = `
+                    <tr class="border-b">
+                        <td class="p-4 font-medium">${room.name}</td>
+                        <td class="p-4">${room.capacity}</td>
+                        <td class="p-4 text-center">
+                            <button class="edit-room-btn text-blue-500 hover:text-blue-700 mr-2" data-id="${room.id}"><i class="fas fa-edit"></i></button>
+                            <button class="delete-room-btn text-red-500 hover:text-red-700" data-id="${room.id}"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+        
         function renderPaymentsPage(filters = {}) {
              const tableBody = document.getElementById('payments-table-body');
              tableBody.innerHTML = '';
@@ -872,7 +907,32 @@
              });
         }
         
+        // --- TAKVİM FONKSİYONLARI (YENİDEN YAPILANDIRILDI) ---
+        
+        // YENİ: Ana Takvim Yönlendiricisi
         function renderCalendar() {
+            const view = document.getElementById('calendar-view-toggle').dataset.view;
+            const courseViewContainer = document.getElementById('calendar-view-course');
+            const roomViewContainer = document.getElementById('calendar-view-room');
+            const courseFilter = document.getElementById('calendar-course-filter');
+
+            if (view === 'room') {
+                // Oda görünümünü göster
+                courseViewContainer.classList.add('hidden');
+                roomViewContainer.classList.remove('hidden');
+                courseFilter.classList.add('hidden'); // Kurs filtresini gizle
+                renderRoomCalendarGrids();
+            } else {
+                // Kurs (genel) görünümünü göster
+                courseViewContainer.classList.remove('hidden');
+                roomViewContainer.classList.add('hidden');
+                courseFilter.classList.remove('hidden'); // Kurs filtresini göster
+                renderCourseCalendarGrid(); // Eski fonksiyonu çağır
+            }
+        }
+        
+        // Eski 'renderCalendar' fonksiyonu, 'renderCourseCalendarGrid' olarak yeniden adlandırıldı
+        function renderCourseCalendarGrid() {
             const grid = document.getElementById('calendar-grid');
             const weekRangeDisplay = document.getElementById('week-range-display');
             grid.innerHTML = '';
@@ -930,11 +990,12 @@
                     
                     studentsInSlot.forEach(student => {
                         const course = state.courses.find(c => c.id === student.courseId);
+                        const room = state.rooms.find(r => r.id === student.roomId); // YENİ
                         if (course) {
                             slotContentHTML += `<div class="available calendar-event p-1 rounded mb-1 text-[11px] leading-tight border border-blue-200" data-student-id="${student.id}">
                                                 <p class="font-bold">${course.name}</p>
                                                 <p>${student.firstName} (${student.time})</p>
-                                             </div>`;
+                                                <p class="font-semibold text-blue-700">${room ? room.name : 'Oda Yok'}</p> </div>`;
                         }
                     });
                     
@@ -942,11 +1003,12 @@
                          const student = state.students.find(s => s.id == makeup.studentId);
                          if (student) {
                              const course = state.courses.find(c => c.id === student.courseId);
+                             const room = state.rooms.find(r => r.id === student.roomId); // YENİ
                              if (course) {
                                  slotContentHTML += `<div class="makeup calendar-event p-1 rounded mb-1 text-[11px] leading-tight border border-yellow-300" data-student-id="${student.id}">
                                                     <p class="font-bold">${course.name} (Telafi)</p>
                                                     <p>${student.firstName} (${makeup.time})</p>
-                                                 </div>`;
+                                                    <p class="font-semibold text-yellow-700">${room ? room.name : 'Oda Yok'}</p> </div>`;
                              }
                          }
                     });
@@ -961,6 +1023,77 @@
             });
         }
         
+        // YENİ: Oda bazlı takvim görünümünü oluşturan fonksiyon
+        function renderRoomCalendarGrids() {
+            const container = document.getElementById('calendar-view-room');
+            const weekRangeDisplay = document.getElementById('week-range-display');
+            container.innerHTML = ''; // İçeriği temizle
+
+            const weekInfo = getWeekInfo(viewDate);
+            const { weekStart, weekEnd, dates } = weekInfo;
+            const dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+            const fullDayNames = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+            const timeSlots = Array.from({ length: 13 }, (_, i) => `${String(i + 9).padStart(2, '0')}:00`);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            const options = { month: 'short', day: 'numeric' };
+            weekRangeDisplay.textContent = `${weekStart.toLocaleDateString('tr-TR', options)} - ${weekEnd.toLocaleDateString('tr-TR', options)} ${weekStart.getFullYear()}`;
+
+            const activeStudents = state.students.filter(s => s.status === 'active');
+
+            // Her oda için bir takvim oluştur
+            state.rooms.forEach(room => {
+                let gridHtml = `<div class="bg-white p-4 rounded-lg shadow-md overflow-x-auto">`;
+                gridHtml += `<h3 class="text-xl font-bold mb-4 text-indigo-700">${room.name}</h3>`;
+                gridHtml += `<div class="grid" style="grid-template-columns: 60px repeat(7, 1fr); min-width: 600px;">`;
+
+                // Header (Günler)
+                gridHtml += `<div class="font-semibold p-2 text-center text-sm"></div>`;
+                dates.forEach((date, i) => {
+                    const isToday = date.getTime() === today.getTime();
+                    gridHtml += `<div class="font-semibold p-2 text-center text-sm ${isToday ? 'bg-blue-100 rounded-t' : ''}">${dayNames[i]}<br>${date.getDate()}</div>`;
+                });
+
+                // Saatler ve Dersler
+                timeSlots.forEach(time => {
+                    gridHtml += `<div class="font-semibold p-2 text-center text-sm flex items-center justify-center border-t">${time}</div>`;
+                    dates.forEach((date, i) => {
+                        const day = fullDayNames[i];
+                        const isToday = date.getTime() === today.getTime();
+                        
+                        // SADECE BU ODAYA AİT öğrencileri filtrele
+                        let studentsInSlot = activeStudents.filter(s => 
+                            s.day === day && 
+                            s.time.startsWith(time.substring(0,2)) && 
+                            s.roomId === room.id
+                        );
+                        
+                        let slotContentHTML = '';
+                        studentsInSlot.forEach(student => {
+                            const course = state.courses.find(c => c.id === student.courseId);
+                            slotContentHTML += `<div class="available calendar-event p-1 rounded mb-1 text-[11px] leading-tight border border-blue-200" data-student-id="${student.id}">
+                                                <p class="font-bold">${course ? course.name : ''}</p>
+                                                <p>${student.firstName} (${student.time})</p>
+                                             </div>`;
+                        });
+                        
+                        // (Telafi dersleri de buraya eklenebilir)
+
+                        const todayClass = isToday ? 'bg-blue-50' : '';
+                        if (slotContentHTML === '') {
+                            gridHtml += `<div class="calendar-slot empty ${todayClass} border-t"></div>`;
+                        } else {
+                            gridHtml += `<div class="calendar-slot p-1 overflow-y-auto ${todayClass} border-t">${slotContentHTML}</div>`;
+                        }
+                    });
+                });
+
+                gridHtml += `</div></div>`; // grid ve shadow-md div'lerini kapat
+                container.innerHTML += gridHtml;
+            });
+        }
+        
         // --- MODAL FONKSİYONLARI ---
         function showModal(content) {
             modalContent.innerHTML = content;
@@ -972,10 +1105,13 @@
             modalContent.innerHTML = '';
         }
         
+        // GÜNCELLENDİ: Öğrenci Formu
         function getStudentFormHTML(student = {}) {
             const isEditing = !!student.id;
             const title = isEditing ? 'Öğrenci Bilgilerini Düzenle' : 'Yeni Öğrenci Ekle';
             let courseOptions = state.courses.map(c => `<option value="${c.id}" ${student.courseId == c.id ? 'selected' : ''}>${c.name}</option>`).join('');
+            // YENİ: Oda seçenekleri
+            let roomOptions = state.rooms.map(r => `<option value="${r.id}" ${student.roomId == r.id ? 'selected' : ''}>${r.name} (Kapasite: ${r.capacity})</option>`).join('');
             const daysOfWeek = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
             let dayOptions = daysOfWeek.map(d => `<option value="${d}" ${student.day === d ? 'selected' : ''}>${d}</option>`).join('');
             
@@ -1009,6 +1145,13 @@
                             <div>
                                <label class="block text-sm font-medium text-gray-700">Ders Saati</label>
                                <input type="time" name="time" value="${student.time || '09:00'}" required class="mt-1 block w-full p-2 border rounded">
+                            </div>
+                            <div class="md:col-span-2"> 
+                               <label class="block text-sm font-medium text-gray-700">Oda</label>
+                               <select name="roomId" required class="mt-1 block w-full p-2 border rounded">
+                                    <option value="">Oda Seçin...</option>
+                                    ${roomOptions}
+                               </select>
                             </div>
                         </div>
                         <textarea name="notes" placeholder="Özel Notlar..." class="w-full p-2 border rounded mt-4">${student.notes || ''}</textarea>
@@ -1045,6 +1188,25 @@
                     <div class="flex justify-end mt-6 gap-4">
                         <button type="button" id="cancel-modal-btn" class="bg-gray-300 px-4 py-2 rounded">İptal</button>
                         <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">${isEditing ? 'Güncelle' : 'Kaydet'}</button>
+                    </div>
+                 </form>
+            `;
+        }
+        
+        // YENİ: Oda Ekle/Düzenle Modal HTML'i
+        function getRoomFormHTML(room = {}) {
+            const isEditing = !!room.id;
+            const title = isEditing ? 'Oda Bilgilerini Düzenle' : 'Yeni Oda Ekle';
+            return `
+                 <h2 class="text-2xl font-bold mb-6">${title}</h2>
+                 <form id="room-form" data-id="${room.id || ''}">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" name="name" placeholder="Oda Adı (Örn: Atölye 1)" value="${room.name || ''}" required class="p-2 border rounded">
+                        <input type="number" name="capacity" placeholder="Kapasite" value="${room.capacity || ''}" required class="p-2 border rounded">
+                    </div>
+                    <div class="flex justify-end mt-6 gap-4">
+                        <button type="button" id="cancel-modal-btn" class="bg-gray-300 px-4 py-2 rounded">İptal</button>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">${isEditing ? 'Güncelle' : 'Kaydet'}</button>
                     </div>
                  </form>
             `;
@@ -1237,6 +1399,7 @@
         function generateStudentInfoHTML(studentId) {
             const student = state.students.find(s => s.id == studentId);
             const course = state.courses.find(c => c.id === student.courseId);
+            const room = state.rooms.find(r => r.id === student.roomId); // YENİ
             if (!student || !course) return "<p>Öğrenci bilgileri bulunamadı.</p>";
 
             const balance = (student.payments || []).reduce((sum, p) => sum + p.amount, 0);
@@ -1274,7 +1437,7 @@
                         <p><strong>Adı Soyadı:</strong> ${student.firstName} ${student.lastName}</p>
                         <p><strong>Kurs:</strong> ${course.name}</p>
                         <p><strong>Ders Programı:</strong> ${student.day} günleri, saat ${student.time}</p>
-                    </section>
+                        <p><strong>Oda:</strong> ${room ? room.name : 'Belirtilmemiş'}</p> </section>
                     
                     <section style="margin-bottom: 20px;">
                         <h2 style="border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px;">Devam Geçmişi</h2>
@@ -1324,6 +1487,7 @@
             }
         }
         
+        // GÜNCELLENDİ: Öğrenci Formu Gönderimi (Oda Çakışma Kontrolü)
         async function handleStudentFormSubmit(e) {
             e.preventDefault();
             const form = e.target.closest('form');
@@ -1333,14 +1497,32 @@
             studentData.courseId = studentData.courseId;
             studentData.fee = parseFloat(studentData.fee);
             studentData.lessonsPerFee = parseInt(studentData.lessonsPerFee);
+            studentData.roomId = studentData.roomId; // YENİ: roomId'yi al
 
             const course = state.courses.find(c => c.id === studentData.courseId);
             const activeStudents = state.students.filter(s => s.status === 'active');
+            
+            // Kursun kendi kontenjan kontrolü
             const studentsInSlot = activeStudents.filter(s => s.id != id && s.courseId === studentData.courseId && s.day === studentData.day && s.time === studentData.time);
 
             if (course && studentsInSlot.length >= course.quota) {
-                document.getElementById('form-error').textContent = `Bu saat dilimi dolu! (Kontenjan: ${course.quota})`;
+                document.getElementById('form-error').textContent = `Bu saat dilimi dolu! (Kurs Kontenjanı: ${course.quota})`;
                 return;
+            }
+            
+            // YENİ: ODA ÇAKIŞMA KONTROLÜ
+            const room = state.rooms.find(r => r.id === studentData.roomId);
+            const roomCapacity = room ? room.capacity : 0;
+            const studentsInRoomAtTime = activeStudents.filter(s => 
+                s.id != id &&
+                s.day === studentData.day &&
+                s.time === studentData.time &&
+                s.roomId === studentData.roomId
+            );
+
+            if (room && studentsInRoomAtTime.length >= roomCapacity) {
+                 document.getElementById('form-error').textContent = `Bu oda (${room.name}) seçtiğiniz saatte dolu! (Oda Kapasitesi: ${roomCapacity})`;
+                 return;
             }
             
             loadingOverlay.classList.remove('hidden');
@@ -1379,6 +1561,30 @@
                 }
             } catch (error) {
                 console.error("Kurs kaydedilemedi: ", error);
+            } finally {
+                loadingOverlay.classList.add('hidden');
+                hideModal();
+            }
+        }
+        
+        // YENİ: Oda formunu işle
+        async function handleRoomFormSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const id = form.dataset.id;
+            const formData = new FormData(form);
+            const roomData = Object.fromEntries(formData.entries());
+            roomData.capacity = parseInt(roomData.capacity);
+
+            loadingOverlay.classList.remove('hidden');
+            try {
+                if (id) {
+                    await db.collection('rooms').doc(id).update(roomData);
+                } else {
+                    await db.collection('rooms').add(roomData);
+                }
+            } catch (error) {
+                console.error("Oda kaydedilemedi: ", error);
             } finally {
                 loadingOverlay.classList.add('hidden');
                 hideModal();
@@ -1569,6 +1775,7 @@
             hideModal();
         }
 
+        // GÜNCELLENDİ: Tablo Tıklamaları (Oda yönetimi eklendi)
         async function handleTableClicks(e) {
             const target = e.target.closest('button, a');
             if (!target) return;
@@ -1618,6 +1825,25 @@
                     loadingOverlay.classList.add('hidden');
                 }
             }
+            // YENİ ODA BUTONLARI
+            if (target.classList.contains('edit-room-btn')) {
+                const room = state.rooms.find(r => r.id == id);
+                if (room) showModal(getRoomFormHTML(room));
+            }
+            if (target.classList.contains('delete-room-btn')) {
+                // Odayı silmeden önce kullanan öğrenci var mı kontrol et
+                const studentsInRoom = state.students.filter(s => s.roomId === id).length;
+                if (studentsInRoom > 0) {
+                    alert('Bu odaya atanmış öğrenciler varken odayı silemezsiniz. Lütfen önce öğrencilerin odasını değiştirin.');
+                    return;
+                }
+                if (confirm('Bu odayı kalıcı olarak silmek istediğinizden emin misiniz?')) {
+                    loadingOverlay.classList.remove('hidden');
+                    await db.collection('rooms').doc(id).delete();
+                    loadingOverlay.classList.add('hidden');
+                }
+            }
+            // BİTİŞ
             if (target.classList.contains('add-payment-btn')) {
                 const student = state.students.find(s => s.id == id);
                 if (student) showModal(getPaymentFormHTML(student));
@@ -1690,6 +1916,7 @@
         document.querySelector('aside nav').addEventListener('click', handleNavigation);
         document.getElementById('add-student-btn').addEventListener('click', () => showModal(getStudentFormHTML()));
         document.getElementById('add-course-btn').addEventListener('click', () => showModal(getCourseFormHTML()));
+        document.getElementById('add-room-btn').addEventListener('click', () => showModal(getRoomFormHTML())); // YENİ
         
         menuBtn.addEventListener('click', toggleMenu);
         menuOverlay.addEventListener('click', toggleMenu);
@@ -1705,6 +1932,26 @@
         document.getElementById('today-btn').addEventListener('click', () => {
             viewDate = new Date();
             renderCalendar();
+        });
+
+        // YENİ: Takvim görünüm değiştirme butonu
+        document.getElementById('calendar-view-toggle').addEventListener('click', (e) => {
+            const btn = e.target;
+            const currentView = btn.dataset.view;
+            
+            if (currentView === 'course') {
+                btn.dataset.view = 'room';
+                btn.textContent = 'Kurs Bazlı Göster';
+                btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+            } else {
+                btn.dataset.view = 'course';
+                btn.textContent = 'Oda Bazlı Göster';
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }
+            
+            renderCalendar(); // Görünümü yeniden render et
         });
 
         document.getElementById('student-search').addEventListener('input', renderStudentsPage);
@@ -1803,6 +2050,7 @@
             }
         });
         
+        // GÜNCELLENDİ: Modal Form Gönderimi (Oda formu eklendi)
         modalContent.addEventListener('submit', (e) => {
             e.preventDefault(); 
             e.stopPropagation();
@@ -1823,27 +2071,32 @@
                     const course = state.courses.find(c => c.id === student.courseId);
                     if (!course) return;
 
-                    const regularStudentsInSlot = state.students.filter(s =>
-                        s.status === 'active' &&
-                        s.courseId === student.courseId &&
+                    // ODA KONTROLÜ (Telafi için)
+                    const telafiRoom = state.rooms.find(r => r.id === student.roomId); // Telafiyi öğrencinin kendi odasına atıyoruz
+                    const roomCapacity = telafiRoom ? telafiRoom.capacity : 0;
+                    
+                    const activeStudents = state.students.filter(s => s.status === 'active');
+
+                    const regularStudentsInSlot = activeStudents.filter(s =>
                         s.day === dayName &&
-                        s.time === time
+                        s.time === time &&
+                        s.roomId === student.roomId
                     ).length;
 
-                    const makeupsInSlot = state.students.flatMap(s => s.attendance || [])
+                    const makeupsInSlot = activeStudents.flatMap(s => s.attendance || [])
                         .filter(a => {
                             const makeupStudent = state.students.find(st => st.id == a.studentId);
                             return makeupStudent && makeupStudent.status === 'active' &&
                                 a.status === 'telafi' &&
                                 a.date === date &&
                                 a.time === time &&
-                                (makeupStudent.courseId === student.courseId);
+                                (makeupStudent.roomId === student.roomId);
                         }).length;
                     
                     const totalInSlot = regularStudentsInSlot + makeupsInSlot;
 
-                    if (totalInSlot >= course.quota) {
-                        errorP.textContent = `Bu saat dolu! (Kontenjan: ${course.quota})`;
+                    if (totalInSlot >= roomCapacity) {
+                        errorP.textContent = `Bu saat dolu! (${telafiRoom.name} Kapasite: ${roomCapacity})`;
                         return;
                     }
 
@@ -1853,6 +2106,8 @@
                 handleStudentFormSubmit(e);
             } else if (e.target.id === 'course-form') {
                 handleCourseFormSubmit(e);
+            } else if (e.target.id === 'room-form') { // YENİ
+                handleRoomFormSubmit(e);
             } else if (e.target.id === 'payment-form') {
                 handlePaymentFormSubmit(e);
             }
@@ -1951,13 +2206,14 @@
 
             const tableBody = filteredStudents.map(student => {
                 const course = state.courses.find(c => c.id === student.courseId);
+                const room = state.rooms.find(r => r.id === student.roomId); // YENİ
                 return `
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 6px;">${course ? course.instructor : 'N/A'}</td>
                         <td style="border: 1px solid #ddd; padding: 6px;">${student.firstName} ${student.lastName}</td>
                         <td style="border: 1px solid #ddd; padding: 6px;">${course ? course.name : 'N/A'}</td>
                         <td style="border: 1px solid #ddd; padding: 6px;">${student.day} ${student.time}</td>
-                    </tr>
+                        <td style="border: 1px solid #ddd; padding: 6px;">${room ? room.name : 'N/A'}</td> </tr>
                 `;
             }).join('');
 
@@ -1974,7 +2230,7 @@
             html += `<p style="font-size: 11px; text-align: center; margin-bottom: 15px;">Tarih: ${date}</p>`;
             html += `<table style="width: 100%; border-collapse: collapse; font-size: 10px;">`;
             html += '<thead><tr>';
-            const head = ['Eğitmen', 'Öğrenci Adı Soyadı', 'Kurs', 'Ders Günü ve Saati'];
+            const head = ['Eğitmen', 'Öğrenci Adı Soyadı', 'Kurs', 'Ders Günü ve Saati', 'Oda']; // YENİ
             head.forEach(h => {
                 html += `<th style="border: 1px solid #ddd; padding: 6px; background-color: #f2f2f2; text-align: left;">${h}</th>`;
             });
@@ -2217,7 +2473,7 @@
             } else {
                 sortedWorkload.forEach(([instructor, count]) => {
                     workloadBody.innerHTML += `
-                        <tr classD="border-b">
+                        <tr class="border-b">
                             <td class="p-3">${instructor}</td>
                             <td class="p-3">${count}</td>
                         </tr>
