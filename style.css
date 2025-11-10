@@ -1,0 +1,72 @@
+/* Custom Stiller ve Animasyonlar */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f2f5;
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.page { display: none; }
+.page.active { display: block; }
+
+.modal-backdrop {
+    background-color: rgba(0,0,0,0.5);
+    transition: opacity 0.3s ease;
+}
+.modal-content {
+    transition: transform 0.3s ease;
+}
+.sidebar-icon {
+    transition: all 0.2s ease-in-out;
+}
+.sidebar-icon:hover {
+    transform: scale(1.1);
+}
+.status-paid { background-color: #dcfce7; color: #166534; }
+.status-unpaid { background-color: #fee2e2; color: #991b1b; }
+
+.calendar-slot {
+    border: 1px solid #e5e7eb;
+    padding: 2px;
+    min-height: 40px;
+    transition: background-color: 0.2s;
+}
+.calendar-slot.empty {
+    background-color: #f9fafb;
+    color: #9ca3af;
+}
+.calendar-event {
+     cursor: pointer;
+     font-size: 11px;
+     line-height: 1.2;
+}
+.calendar-event.available {
+    background-color: #eff6ff;
+    border-left: 3px solid #3b82f6;
+}
+.calendar-event.full {
+    background-color: #fee2e2;
+    border-left: 3px solid #ef4444;
+    color: #991b1b;
+}
+.calendar-event.makeup {
+    background-color: #fef9c3;
+    border-left: 3px solid #f59e0b;
+}
+
+
+/* Baskı Stilleri */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #print-area, #print-area * {
+        visibility: visible;
+    }
+    #print-area {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}
