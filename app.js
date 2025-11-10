@@ -1,7 +1,4 @@
 // --- Firebase Proje Ayarları Netlify tarafından güvenli bir şekilde eklenecek ---
-// ÖNEMLİ NOT: Firebase SDK'ları (app, auth, firestore) index.html dosyasında
-// <script type="module"> olarak değil, <script src="..."> olarak yüklendiği için
-// global `firebase` objesini kullanmamız gerekiyor.
 const firebaseConfig = {
   apiKey: "AIzaSyAh2z7aQRYKfJSjRgiakOj_w8bDZp0crMI",
   authDomain: "kursyonetim-f6ebc.firebaseapp.com",
@@ -37,12 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalContent = document.getElementById('modal-content');
     const loadingOverlay = document.getElementById('loading-overlay');
     
-    // Mobile Menu
     const sidebar = document.getElementById('sidebar');
     const menuBtn = document.getElementById('menu-btn');
     const menuOverlay = document.getElementById('menu-overlay');
 
-    // Auth Form Elements
     const authForm = document.getElementById('auth-form');
 
     // --- YARDIMCI FONKSİYONLARI ---
@@ -140,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'payments': renderPaymentsPage(); break;
             case 'calendar': renderCalendar(); break;
             case 'reports': renderReportsPage(); break;
-            case 'how-to-use': /* Bu sayfa statik olduğu için özel bir render fonksiyonu yok */ break;
+            case 'how-to-use': break;
         }
     }
     
@@ -181,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // GÜNCELLENDİ: renderStudentsPage (Artık odayı kurstan alıyor)
     function renderStudentsPage() {
         const filters = {
             name: document.getElementById('student-search').value,
@@ -197,7 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filters.status && filters.status !== 'all') {
             filteredStudents = filteredStudents.filter(s => s.status === filters.status);
         }
-
         if (filters.name) {
             filteredStudents = filteredStudents.filter(s => 
                 `${s.firstName} ${s.lastName}`.toLowerCase().includes(filters.name.toLowerCase())
@@ -214,10 +209,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-
         filteredStudents.forEach(student => {
             const course = state.courses.find(c => c.id === student.courseId);
-            const room = state.rooms.find(r => r.id === student.roomId);
+            // Odayı artık öğrenci üzerinden değil, kurs üzerinden bul
+            const room = course ? state.rooms.find(r => r.id === course.roomId) : null; 
+            
             const balance = (student.payments || []).reduce((sum, p) => sum + p.amount, 0);
             const attendedCount = (student.attendance || []).filter(a => a.status === 'geldi').length % (student.lessonsPerFee || 1);
             const isInactive = student.status === 'inactive';
@@ -289,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateCalendarRoomFilterOptions() {
         const filter = document.getElementById('calendar-room-filter');
         const currentVal = filter.value;
-        filter.innerHTML = '<option value="">Tüm Odalar</option>'; // Varsayılan
+        filter.innerHTML = '<option value="">Tüm Odalar</option>';
         state.rooms.forEach(room => {
             const option = document.createElement('option');
             option.value = room.id;
@@ -301,16 +297,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // GÜNCELLENDİ: renderCoursesPage (Oda adını gösterir)
     function renderCoursesPage() {
         const tableBody = document.getElementById('courses-table-body');
         tableBody.innerHTML = '';
         state.courses.forEach(course => {
             const studentCount = state.students.filter(s => s.courseId === course.id && s.status === 'active').length;
+            const room = state.rooms.find(r => r.id === course.roomId); // Odayı bul
+            
             const row = `
                 <tr class="border-b">
                     <td class="p-4 font-medium">${course.name}</td>
                     <td class="p-4">${course.instructor}</td>
-                    <td class="p-4">${course.duration || 60}</td>
+                    <td class="p-4">${room ? room.name : 'Oda Yok'}</td>
                     <td class="p-4">${course.quota}</td>
                     <td class="p-4">${studentCount}</td>
                     <td class="p-4 text-center">
@@ -409,6 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // GÜNCELLENDİ: renderCourseCalendarGrid (Odayı kurstan alıyor)
     function renderCourseCalendarGrid() {
         const grid = document.getElementById('calendar-grid');
         const weekRangeDisplay = document.getElementById('week-range-display');
@@ -428,7 +428,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const options = { month: 'short', day: 'numeric' };
         weekRangeDisplay.textContent = `${weekStart.toLocaleDateString('tr-TR', options)} - ${weekEnd.toLocaleDateString('tr-TR', options)} ${weekStart.getFullYear()}`;
 
-        // Header
         grid.innerHTML += `<div class="font-semibold p-2 text-center text-sm"></div>`;
         dates.forEach((date, i) => {
             const isToday = date.getTime() === today.getTime();
@@ -467,7 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 studentsInSlot.forEach(student => {
                     const course = state.courses.find(c => c.id === student.courseId);
-                    const room = state.rooms.find(r => r.id === student.roomId);
+                    const room = course ? state.rooms.find(r => r.id === course.roomId) : null;
                     if (course) {
                         slotContentHTML += `<div class="available calendar-event p-1 rounded mb-1 text-[11px] leading-tight border border-blue-200" data-student-id="${student.id}">
                                             <p class="font-bold">${course.name}</p>
@@ -481,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
                      const student = state.students.find(s => s.id == makeup.studentId);
                      if (student) {
                          const course = state.courses.find(c => c.id === student.courseId);
-                         const room = state.rooms.find(r => r.id === student.roomId);
+                         const room = course ? state.rooms.find(r => r.id === course.roomId) : null;
                          if (course) {
                              slotContentHTML += `<div class="makeup calendar-event p-1 rounded mb-1 text-[11px] leading-tight border border-yellow-300" data-student-id="${student.id}">
                                                 <p class="font-bold">${course.name} (Telafi)</p>
@@ -502,6 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // GÜNCELLENDİ: renderRoomCalendarGrids (Odayı kurstan alıyor)
     function renderRoomCalendarGrids() {
         const container = document.getElementById('calendar-view-room');
         const weekRangeDisplay = document.getElementById('week-range-display');
@@ -532,25 +532,26 @@ document.addEventListener('DOMContentLoaded', () => {
             gridHtml += `<h3 class="text-xl font-bold mb-4 text-indigo-700">${room.name}</h3>`;
             gridHtml += `<div class="grid" style="grid-template-columns: 60px repeat(7, 1fr); min-width: 600px;">`;
 
-            // Header (Günler)
             gridHtml += `<div class="font-semibold p-2 text-center text-sm"></div>`;
             dates.forEach((date, i) => {
                 const isToday = date.getTime() === today.getTime();
                 gridHtml += `<div class="font-semibold p-2 text-center text-sm ${isToday ? 'bg-blue-100 rounded-t' : ''}">${dayNames[i]}<br>${date.getDate()}</div>`;
             });
 
-            // Saatler ve Dersler
             timeSlots.forEach(time => {
                 gridHtml += `<div class="font-semibold p-2 text-center text-sm flex items-center justify-center border-t">${time}</div>`;
                 dates.forEach((date, i) => {
                     const day = fullDayNames[i];
                     const isToday = date.getTime() === today.getTime();
                     
-                    let studentsInSlot = activeStudents.filter(s => 
-                        s.day === day && 
-                        s.time.startsWith(time.substring(0,2)) && 
-                        s.roomId === room.id
-                    );
+                    // Öğrencileri bul, ama odayı kurstan kontrol et
+                    let studentsInSlot = activeStudents.filter(s => {
+                        const course = state.courses.find(c => c.id === s.courseId);
+                        return s.day === day && 
+                               s.time.startsWith(time.substring(0,2)) && 
+                               course &&
+                               course.roomId === room.id;
+                    });
                     
                     let slotContentHTML = '';
                     studentsInSlot.forEach(student => {
@@ -590,11 +591,18 @@ document.addEventListener('DOMContentLoaded', () => {
         modalContent.innerHTML = '';
     }
     
+    // GÜNCELLENDİ: getStudentFormHTML (Oda seçimi kaldırıldı)
     function getStudentFormHTML(student = {}) {
         const isEditing = !!student.id;
         const title = isEditing ? 'Öğrenci Bilgilerini Düzenle' : 'Yeni Öğrenci Ekle';
-        let courseOptions = state.courses.map(c => `<option value="${c.id}" ${student.courseId == c.id ? 'selected' : ''}>${c.name}</option>`).join('');
-        let roomOptions = state.rooms.map(r => `<option value="${r.id}" ${student.roomId == r.id ? 'selected' : ''}>${r.name} (Kapasite: ${r.capacity})</option>`).join('');
+        
+        // Kurs seçeneklerini ve hangi odaya bağlı olduklarını göster
+        let courseOptions = state.courses.map(c => {
+            const room = state.rooms.find(r => r.id === c.roomId);
+            const roomName = room ? room.name : 'Oda Atanmamış';
+            return `<option value="${c.id}" ${student.courseId == c.id ? 'selected' : ''}>${c.name} (${roomName})</option>`;
+        }).join('');
+        
         const daysOfWeek = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
         let dayOptions = daysOfWeek.map(d => `<option value="${d}" ${student.day === d ? 'selected' : ''}>${d}</option>`).join('');
         
@@ -611,7 +619,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         <input type="email" name="email" placeholder="E-posta" value="${student.email || ''}" class="p-2 border rounded">
                          <input type="tel" name="parentPhone" placeholder="Veli Telefon" value="${student.parentPhone || ''}" class="p-2 border rounded">
                         <input type="email" name="parentEmail" placeholder="Veli E-posta" value="${student.parentEmail || ''}" class="p-2 border rounded">
-                        <select name="courseId" required class="p-2 border rounded"><option value="">Kurs Seçin...</option>${courseOptions}</select>
+                        
+                        <div class="md:col-span-2">
+                           <label class="block text-sm font-medium text-gray-700">Kurs (ve Odası)</label>
+                           <select name="courseId" required class="mt-1 block w-full p-2 border rounded">
+                                <option value="">Kurs Seçin...</option>
+                                ${courseOptions}
+                           </select>
+                        </div>
+
                         <input type="date" name="registrationDate" value="${student.registrationDate || new Date().toISOString().slice(0,10)}" required class="p-2 border rounded">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Dönem Ücreti</label>
@@ -629,13 +645,6 @@ document.addEventListener('DOMContentLoaded', () => {
                            <label class="block text-sm font-medium text-gray-700">Ders Saati</label>
                            <input type="time" name="time" value="${student.time || '09:00'}" required class="mt-1 block w-full p-2 border rounded">
                         </div>
-                        <div class="md:col-span-2"> 
-                           <label class="block text-sm font-medium text-gray-700">Oda</label>
-                           <select name="roomId" required class="mt-1 block w-full p-2 border rounded">
-                                <option value="">Oda Seçin...</option>
-                                ${roomOptions}
-                           </select>
-                        </div>
                     </div>
                     <textarea name="notes" placeholder="Özel Notlar..." class="w-full p-2 border rounded mt-4">${student.notes || ''}</textarea>
                     <p id="form-error" class="text-red-600 text-sm mt-2 text-center h-4"></p>
@@ -648,9 +657,14 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
     
+    // GÜNCELLENDİ: getCourseFormHTML (Oda seçimi eklendi)
     function getCourseFormHTML(course = {}) {
         const isEditing = !!course.id;
         const title = isEditing ? 'Kurs Bilgilerini Düzenle' : 'Yeni Kurs Ekle';
+        
+        // Oda seçeneklerini oluştur
+        let roomOptions = state.rooms.map(r => `<option value="${r.id}" ${course.roomId == r.id ? 'selected' : ''}>${r.name} (Kapasite: ${r.capacity})</option>`).join('');
+
         return `
              <h2 class="text-2xl font-bold mb-6">${title}</h2>
              <form id="course-form" data-id="${course.id || ''}">
@@ -667,6 +681,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         <label class="block text-sm font-medium text-gray-700">Ders Süresi (dakika)</label>
                         <input type="number" name="duration" placeholder="60" value="${course.duration || '60'}" required class="w-full p-2 border rounded">
                      </div>
+                 </div>
+                 <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700">Atanacak Oda</label>
+                    <select name="roomId" required class="mt-1 block w-full p-2 border rounded">
+                        <option value="">Oda Seçin...</option>
+                        ${roomOptions}
+                    </select>
                  </div>
                 <div class="flex justify-end mt-6 gap-4">
                     <button type="button" id="cancel-modal-btn" class="bg-gray-300 px-4 py-2 rounded">İptal</button>
@@ -878,10 +899,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return message;
     }
 
+    // GÜNCELLENDİ: generateStudentInfoHTML (Odayı kurstan alıyor)
     function generateStudentInfoHTML(studentId) {
         const student = state.students.find(s => s.id == studentId);
         const course = state.courses.find(c => c.id === student.courseId);
-        const room = state.rooms.find(r => r.id === student.roomId);
+        const room = course ? state.rooms.find(r => r.id === course.roomId) : null;
         if (!student || !course) return "<p>Öğrenci bilgileri bulunamadı.</p>";
 
         const balance = (student.payments || []).reduce((sum, p) => sum + p.amount, 0);
@@ -969,46 +991,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // GÜNCELLENDİ: handleStudentFormSubmit (Çakışma mantığı değişti)
     async function handleStudentFormSubmit(e) {
         e.preventDefault();
         const form = e.target.closest('form');
         const id = form.dataset.id;
         const formData = new FormData(form);
         const studentData = Object.fromEntries(formData.entries());
+        
+        // Formdan artık roomId gelmiyor. Diğer verileri al.
         studentData.courseId = studentData.courseId;
         studentData.fee = parseFloat(studentData.fee);
         studentData.lessonsPerFee = parseInt(studentData.lessonsPerFee);
-        studentData.roomId = studentData.roomId;
 
+        // Seçilen kursun bilgilerini al (oda ve kontenjan)
         const course = state.courses.find(c => c.id === studentData.courseId);
+        if (!course) {
+             document.getElementById('form-error').textContent = `Geçerli bir kurs seçilmedi!`;
+             return;
+        }
+        
         const activeStudents = state.students.filter(s => s.status === 'active');
         
-        const studentsInSlot = activeStudents.filter(s => s.id != id && s.courseId === studentData.courseId && s.day === studentData.day && s.time === studentData.time);
+        // YENİ MANTIK: KURS KONTENJANI KONTROLÜ (GERİ GELDİ)
+        // Bu kursa (örn: Piyano-A), bu saatte kaç kişi kayıtlı?
+        const studentsInCourseAtTime = activeStudents.filter(s => 
+            s.id != id && 
+            s.courseId === studentData.courseId && // Birebir aynı kurs
+            s.day === studentData.day && 
+            s.time === studentData.time
+        );
 
-        if (course && studentsInSlot.length >= course.quota) {
-            document.getElementById('form-error').textContent = `Bu saat dilimi dolu! (Kurs Kontenjanı: ${course.quota})`;
+        if (course.quota && studentsInCourseAtTime.length >= course.quota) {
+            document.getElementById('form-error').textContent = `Bu kursun bu saatteki kontenjanı dolu! (Kontenjan: ${course.quota})`;
             return;
         }
         
-        const room = state.rooms.find(r => r.id === studentData.roomId);
-        const roomCapacity = room ? room.capacity : 0;
-        const studentsInRoomAtTime = activeStudents.filter(s => 
-            s.id != id &&
-            s.day === studentData.day &&
-            s.time === studentData.time &&
-            s.roomId === studentData.roomId
-        );
+        // İKİNCİL KONTROL: ODA ÇAKIŞMASI (Hala önemli)
+        // Bu öğrenciyi atayacağımız oda (course.roomId)
+        // o saatte, başka bir kurstan (örn: Keman-A) dolayı dolu mu?
+        const room = state.rooms.find(r => r.id === course.roomId);
+        if (room) {
+            // O odada, o saatte olan TÜM öğrencileri bul (kurs fark etmeksizin)
+            const studentsInRoomAtTime = activeStudents.filter(s => {
+                if (s.id == id) return false; // kendisi değil
+                const studentCourse = state.courses.find(c => c.id === s.courseId);
+                return studentCourse &&
+                       studentCourse.roomId === course.roomId && // Aynı odada
+                       s.day === studentData.day && // Aynı gün
+                       s.time === studentData.time; // Aynı saat
+            });
 
-        if (room && studentsInRoomAtTime.length >= roomCapacity) {
-             document.getElementById('form-error').textContent = `Bu oda (${room.name}) seçtiğiniz saatte dolu! (Oda Kapasitesi: ${roomCapacity})`;
-             return;
+            if (room.capacity && studentsInRoomAtTime.length >= room.capacity) {
+                 document.getElementById('form-error').textContent = `Bu oda (${room.name}) seçtiğiniz saatte başka bir dersten dolayı dolu! (Kapasite: ${room.capacity})`;
+                 return;
+            }
         }
         
         loadingOverlay.classList.remove('hidden');
         try {
             if (id) { 
+                // Güncellemede sadece studentData'yı yolla (roomId ZATEN YOK)
                 await db.collection('students').doc(id).update(studentData);
             } else { 
+                // Yeni kayıtta da studentData'yı yolla
                 studentData.payments = [{ amount: -studentData.fee, date: new Date().toISOString(), type: 'initial'}];
                 studentData.attendance = [];
                 studentData.status = 'active';
@@ -1022,6 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // GÜNCELLENDİ: handleCourseFormSubmit (roomId eklendi)
     async function handleCourseFormSubmit(e) {
         e.preventDefault();
         const form = e.target;
@@ -1030,6 +1077,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const courseData = Object.fromEntries(formData.entries());
         courseData.quota = parseInt(courseData.quota);
         courseData.duration = parseInt(courseData.duration) || 60;
+        courseData.roomId = courseData.roomId; // YENİ
 
         loadingOverlay.classList.remove('hidden');
         try {
@@ -1305,9 +1353,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (room) showModal(getRoomFormHTML(room));
         }
         if (target.classList.contains('delete-room-btn')) {
-            const studentsInRoom = state.students.filter(s => s.roomId === id).length;
-            if (studentsInRoom > 0) {
-                alert('Bu odaya atanmış öğrenciler varken odayı silemezsiniz. Lütfen önce öğrencilerin odasını değiştirin.');
+            // Odayı silmeden önce kullanan kurs var mı kontrol et
+            const coursesInRoom = state.courses.filter(c => c.roomId === id).length;
+            if (coursesInRoom > 0) {
+                alert('Bu odaya atanmış kurslar varken odayı silemezsiniz. Lütfen önce kursların odasını değiştirin.');
                 return;
             }
             if (confirm('Bu odayı kalıcı olarak silmek istediğinizden emin misiniz?')) {
@@ -1521,6 +1570,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // GÜNCELLENDİ: Telafi Formu (Oda kontrolü eklendi)
     modalContent.addEventListener('submit', (e) => {
         e.preventDefault(); 
         e.stopPropagation();
@@ -1541,28 +1591,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 const course = state.courses.find(c => c.id === student.courseId);
                 if (!course) return;
 
-                const telafiRoom = state.rooms.find(r => r.id === student.roomId);
+                // Telafi için öğrencinin KENDİ KURSUNUN odasını kontrol et
+                const telafiRoom = state.rooms.find(r => r.id === course.roomId);
                 const roomCapacity = telafiRoom ? telafiRoom.capacity : 0;
                 
                 const activeStudents = state.students.filter(s => s.status === 'active');
 
-                const regularStudentsInSlot = activeStudents.filter(s =>
-                    s.day === dayName &&
-                    s.time === time &&
-                    s.roomId === student.roomId
-                ).length;
+                // O odada, o gün ve saatte kaç kişi var?
+                const studentsInRoomAtTime = activeStudents.filter(s => {
+                    const studentCourse = state.courses.find(c => c.id === s.courseId);
+                    return studentCourse &&
+                           studentCourse.roomId === course.roomId && // Aynı odada
+                           s.day === dayName && // Aynı gün
+                           s.time === time; // Aynı saat
+                });
 
-                const makeupsInSlot = activeStudents.flatMap(s => s.attendance || [])
+                // O odada, o gün ve saatte kaç telafi var?
+                const makeupsInRoomAtTime = activeStudents.flatMap(s => s.attendance || [])
                     .filter(a => {
                         const makeupStudent = state.students.find(st => st.id == a.studentId);
-                        return makeupStudent && makeupStudent.status === 'active' &&
-                            a.status === 'telafi' &&
-                            a.date === date &&
-                            a.time === time &&
-                            (makeupStudent.roomId === student.roomId);
+                        if (!makeupStudent) return false;
+                        const makeupCourse = state.courses.find(c => c.id === makeupStudent.courseId);
+                        return makeupCourse &&
+                               a.status === 'telafi' &&
+                               a.date === date &&
+                               a.time === time &&
+                               makeupCourse.roomId === course.roomId;
                     }).length;
                 
-                const totalInSlot = regularStudentsInSlot + makeupsInSlot;
+                const totalInSlot = studentsInRoomAtTime.length + makeupsInRoomAtTime;
 
                 if (totalInSlot >= roomCapacity) {
                     errorP.textContent = `Bu saat dolu! (${telafiRoom.name} Kapasite: ${roomCapacity})`;
@@ -1638,6 +1695,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // GÜNCELLENDİ: handleDownloadPDF (Odayı kurstan alıyor)
     function handleDownloadPDF() {
         const filters = {
             name: document.getElementById('student-search').value,
@@ -1672,7 +1730,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const tableBody = filteredStudents.map(student => {
             const course = state.courses.find(c => c.id === student.courseId);
-            const room = state.rooms.find(r => r.id === student.roomId);
+            const room = course ? state.rooms.find(r => r.id === course.roomId) : null;
             return `
                 <tr>
                     <td style="border: 1px solid #ddd; padding: 6px;">${course ? course.instructor : 'N/A'}</td>
