@@ -295,6 +295,7 @@
                         </table>
                     </div>
                 </div>
+
                 <div id="payments-page" class="page">
                     <h1 class="text-3xl font-bold text-gray-800 mb-6">Ödeme Takibi</h1>
                     <div class="bg-white p-4 rounded-lg shadow-md mb-6 flex flex-col md:flex-row gap-4">
@@ -336,6 +337,8 @@
                         </div>
                         <div class="flex items-center gap-4">
                             <select id="calendar-course-filter" class="p-2 border rounded-md w-full md:w-48"></select>
+                            <select id="calendar-room-filter" class="p-2 border rounded-md w-full md:w-48 hidden">
+                                </select>
                             <button id="calendar-view-toggle" data-view="course" class="px-3 py-2 text-sm bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 whitespace-nowrap">
                                 Oda Bazlı Göster
                             </button>
@@ -495,6 +498,7 @@
                                 <li>Bir odayı silmek için, o odaya atanmış aktif bir öğrenci olmamalıdır.</li>
                             </ul>
                         </section>
+
                         <section class="mb-8">
                             <h2 class="text-2xl font-bold text-gray-700 mb-4">4. Ödeme Takibi</h2>
                             <ul class="list-disc list-inside space-y-2">
@@ -510,7 +514,7 @@
                                 <li><strong>Görünüm Değiştirme:</strong> Sağ üstteki <strong class="text-blue-600">"Oda Bazlı Göster"</strong> / <strong class="text-green-600">"Kurs Bazlı Göster"</strong> butonu ile takvim görünümünü değiştirebilirsiniz.
                                     <ul class="list-disc list-inside ml-4 mt-1">
                                         <li><strong>Kurs Bazlı:</strong> Tüm dersleri tek bir takvimde, kursa göre filtrelenebilir şekilde gösterir.</li>
-                                        <li><strong>Oda Bazlı:</strong> Her bir oda için ayrı bir haftalık takvim oluşturur, böylece odaların doluluğunu bir bakışta görebilirsiniz.</li>
+                                        <li><strong>Oda Bazlı:</strong> (Yeni) Artık bir "Oda Filtresi"ne sahiptir. "Tüm Odalar"ı veya sadece belirli bir odayı listeleyebilirsiniz.</li>
                                     </ul>
                                 </li>
                                 <li><strong>Hızlı İşlem:</strong> Takvimdeki bir derse tıkladığınızda, ilgili öğrencinin devam durumunu ("Geldi", "Gelmedi") işleyebileceğiniz pencere açılır.</li>
@@ -559,7 +563,7 @@
         let state = {
             students: [],
             courses: [],
-            rooms: [] // YENİ
+            rooms: []
         };
 
         let viewDate = new Date();
@@ -623,10 +627,10 @@
                 loadingOverlay.classList.add('hidden');
             });
 
-            // YENİ: Odaları dinle
+            // Odaları dinle
             db.collection('rooms').onSnapshot(snapshot => {
                 state.rooms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                updateAllSelects(); // Odalar değiştiğinde de filtreleri/formları güncelle
+                updateAllSelects();
                 renderAllPages();
                 loadingOverlay.classList.add('hidden');
             }, error => {
@@ -655,6 +659,7 @@
             updateStudentFilterOptions();
             updatePaymentFilterOptions();
             updateCalendarFilterOptions();
+            updateCalendarRoomFilterOptions(); // YENİ
         }
 
         // --- GÖRÜNÜM (VIEW) FONKSİYONLARI ---
@@ -673,7 +678,7 @@
                 case 'dashboard': renderDashboard(); break;
                 case 'students': renderStudentsPage(); break;
                 case 'courses': renderCoursesPage(); break;
-                case 'rooms': renderRoomsPage(); break; // YENİ
+                case 'rooms': renderRoomsPage(); break;
                 case 'payments': renderPaymentsPage(); break;
                 case 'calendar': renderCalendar(); break;
                 case 'reports': renderReportsPage(); break;
@@ -754,7 +759,7 @@
 
             filteredStudents.forEach(student => {
                 const course = state.courses.find(c => c.id === student.courseId);
-                const room = state.rooms.find(r => r.id === student.roomId); // YENİ: Odayı bul
+                const room = state.rooms.find(r => r.id === student.roomId);
                 const balance = (student.payments || []).reduce((sum, p) => sum + p.amount, 0);
                 const attendedCount = (student.attendance || []).filter(a => a.status === 'geldi').length % (student.lessonsPerFee || 1);
                 const isInactive = student.status === 'inactive';
@@ -767,7 +772,8 @@
                         </td>
                         <td class="p-4">${course ? course.name : 'Kurs Bulunamadı'}</td>
                         <td class="p-4">${student.day} / ${student.time}</td>
-                        <td class="p-4">${room ? room.name : 'N/A'}</td> <td class="p-4 font-semibold ${balance < 0 ? 'text-red-600' : 'text-green-600'}">${balance.toFixed(2)} ₺</td>
+                        <td class="p-4">${room ? room.name : 'N/A'}</td>
+                        <td class="p-4 font-semibold ${balance < 0 ? 'text-red-600' : 'text-green-600'}">${balance.toFixed(2)} ₺</td>
                         <td class="p-4 text-center">
                             <button class="edit-student-btn text-blue-500 hover:text-blue-700 mr-2" data-id="${student.id}" title="Düzenle"><i class="fas fa-edit"></i></button>
                             <button class="delete-student-btn text-red-500 hover:text-red-700 mr-2" data-id="${student.id}" title="Sil"><i class="fas fa-trash"></i></button>
@@ -821,6 +827,23 @@
                  filter.value = currentVal;
             }
         }
+        
+        // YENİ: Takvim Oda Filtresini Güncelle
+        function updateCalendarRoomFilterOptions() {
+            const filter = document.getElementById('calendar-room-filter');
+            const currentVal = filter.value;
+            filter.innerHTML = '<option value="">Tüm Odalar</option>'; // Varsayılan
+            state.rooms.forEach(room => {
+                const option = document.createElement('option');
+                option.value = room.id;
+                option.textContent = room.name;
+                filter.appendChild(option);
+            });
+            // Seçili değeri koru
+            if (currentVal && state.rooms.some(r => r.id == currentVal)) {
+                 filter.value = currentVal;
+            }
+        }
 
         function renderCoursesPage() {
             const tableBody = document.getElementById('courses-table-body');
@@ -844,7 +867,6 @@
             });
         }
         
-        // YENİ: Odalar sayfasını render et
         function renderRoomsPage() {
             const tableBody = document.getElementById('rooms-table-body');
             tableBody.innerHTML = '';
@@ -907,31 +929,33 @@
              });
         }
         
-        // --- TAKVİM FONKSİYONLARI (YENİDEN YAPILANDIRILDI) ---
+        // --- TAKVİM FONKSİYONLARI ---
         
-        // YENİ: Ana Takvim Yönlendiricisi
+        // GÜNCELLENDİ: Ana Takvim Yönlendiricisi (Filtreleri Değiştirir)
         function renderCalendar() {
             const view = document.getElementById('calendar-view-toggle').dataset.view;
             const courseViewContainer = document.getElementById('calendar-view-course');
             const roomViewContainer = document.getElementById('calendar-view-room');
             const courseFilter = document.getElementById('calendar-course-filter');
+            const roomFilter = document.getElementById('calendar-room-filter'); // YENİ
 
             if (view === 'room') {
                 // Oda görünümünü göster
                 courseViewContainer.classList.add('hidden');
                 roomViewContainer.classList.remove('hidden');
                 courseFilter.classList.add('hidden'); // Kurs filtresini gizle
+                roomFilter.classList.remove('hidden'); // Oda filtresini göster
                 renderRoomCalendarGrids();
             } else {
                 // Kurs (genel) görünümünü göster
                 courseViewContainer.classList.remove('hidden');
                 roomViewContainer.classList.add('hidden');
                 courseFilter.classList.remove('hidden'); // Kurs filtresini göster
-                renderCourseCalendarGrid(); // Eski fonksiyonu çağır
+                roomFilter.classList.add('hidden'); // Oda filtresini gizle
+                renderCourseCalendarGrid();
             }
         }
         
-        // Eski 'renderCalendar' fonksiyonu, 'renderCourseCalendarGrid' olarak yeniden adlandırıldı
         function renderCourseCalendarGrid() {
             const grid = document.getElementById('calendar-grid');
             const weekRangeDisplay = document.getElementById('week-range-display');
@@ -990,12 +1014,13 @@
                     
                     studentsInSlot.forEach(student => {
                         const course = state.courses.find(c => c.id === student.courseId);
-                        const room = state.rooms.find(r => r.id === student.roomId); // YENİ
+                        const room = state.rooms.find(r => r.id === student.roomId);
                         if (course) {
                             slotContentHTML += `<div class="available calendar-event p-1 rounded mb-1 text-[11px] leading-tight border border-blue-200" data-student-id="${student.id}">
                                                 <p class="font-bold">${course.name}</p>
                                                 <p>${student.firstName} (${student.time})</p>
-                                                <p class="font-semibold text-blue-700">${room ? room.name : 'Oda Yok'}</p> </div>`;
+                                                <p class="font-semibold text-blue-700">${room ? room.name : 'Oda Yok'}</p>
+                                             </div>`;
                         }
                     });
                     
@@ -1003,12 +1028,13 @@
                          const student = state.students.find(s => s.id == makeup.studentId);
                          if (student) {
                              const course = state.courses.find(c => c.id === student.courseId);
-                             const room = state.rooms.find(r => r.id === student.roomId); // YENİ
+                             const room = state.rooms.find(r => r.id === student.roomId);
                              if (course) {
                                  slotContentHTML += `<div class="makeup calendar-event p-1 rounded mb-1 text-[11px] leading-tight border border-yellow-300" data-student-id="${student.id}">
                                                     <p class="font-bold">${course.name} (Telafi)</p>
                                                     <p>${student.firstName} (${makeup.time})</p>
-                                                    <p class="font-semibold text-yellow-700">${room ? room.name : 'Oda Yok'}</p> </div>`;
+                                                    <p class="font-semibold text-yellow-700">${room ? room.name : 'Oda Yok'}</p>
+                                                 </div>`;
                              }
                          }
                     });
@@ -1023,11 +1049,11 @@
             });
         }
         
-        // YENİ: Oda bazlı takvim görünümünü oluşturan fonksiyon
+        // GÜNCELLENDİ: Oda Bazlı Takvim (Filtrelemeyi Kullanır)
         function renderRoomCalendarGrids() {
             const container = document.getElementById('calendar-view-room');
             const weekRangeDisplay = document.getElementById('week-range-display');
-            container.innerHTML = ''; // İçeriği temizle
+            container.innerHTML = ''; 
 
             const weekInfo = getWeekInfo(viewDate);
             const { weekStart, weekEnd, dates } = weekInfo;
@@ -1041,9 +1067,19 @@
             weekRangeDisplay.textContent = `${weekStart.toLocaleDateString('tr-TR', options)} - ${weekEnd.toLocaleDateString('tr-TR', options)} ${weekStart.getFullYear()}`;
 
             const activeStudents = state.students.filter(s => s.status === 'active');
+            
+            // YENİ FİLTRELEME MANTIĞI
+            const filterRoomId = document.getElementById('calendar-room-filter').value;
+            let roomsToRender = state.rooms;
+            
+            // Eğer belirli bir oda seçildiyse, sadece o odayı render et
+            if (filterRoomId) {
+                roomsToRender = state.rooms.filter(r => r.id === filterRoomId);
+            }
+            // *** BİTİŞ ***
 
-            // Her oda için bir takvim oluştur
-            state.rooms.forEach(room => {
+            // Her oda için bir takvim oluştur (filtrelenmiş listeyi kullan)
+            roomsToRender.forEach(room => {
                 let gridHtml = `<div class="bg-white p-4 rounded-lg shadow-md overflow-x-auto">`;
                 gridHtml += `<h3 class="text-xl font-bold mb-4 text-indigo-700">${room.name}</h3>`;
                 gridHtml += `<div class="grid" style="grid-template-columns: 60px repeat(7, 1fr); min-width: 600px;">`;
@@ -1062,7 +1098,6 @@
                         const day = fullDayNames[i];
                         const isToday = date.getTime() === today.getTime();
                         
-                        // SADECE BU ODAYA AİT öğrencileri filtrele
                         let studentsInSlot = activeStudents.filter(s => 
                             s.day === day && 
                             s.time.startsWith(time.substring(0,2)) && 
@@ -1077,8 +1112,6 @@
                                                 <p>${student.firstName} (${student.time})</p>
                                              </div>`;
                         });
-                        
-                        // (Telafi dersleri de buraya eklenebilir)
 
                         const todayClass = isToday ? 'bg-blue-50' : '';
                         if (slotContentHTML === '') {
@@ -1089,9 +1122,13 @@
                     });
                 });
 
-                gridHtml += `</div></div>`; // grid ve shadow-md div'lerini kapat
+                gridHtml += `</div></div>`;
                 container.innerHTML += gridHtml;
             });
+            
+            if (roomsToRender.length === 0 && filterRoomId === "") {
+                 container.innerHTML = `<p class="text-center text-gray-500">Lütfen önce "Odalar" sayfasından bir oda ekleyin.</p>`;
+            }
         }
         
         // --- MODAL FONKSİYONLARI ---
@@ -1105,12 +1142,10 @@
             modalContent.innerHTML = '';
         }
         
-        // GÜNCELLENDİ: Öğrenci Formu
         function getStudentFormHTML(student = {}) {
             const isEditing = !!student.id;
             const title = isEditing ? 'Öğrenci Bilgilerini Düzenle' : 'Yeni Öğrenci Ekle';
             let courseOptions = state.courses.map(c => `<option value="${c.id}" ${student.courseId == c.id ? 'selected' : ''}>${c.name}</option>`).join('');
-            // YENİ: Oda seçenekleri
             let roomOptions = state.rooms.map(r => `<option value="${r.id}" ${student.roomId == r.id ? 'selected' : ''}>${r.name} (Kapasite: ${r.capacity})</option>`).join('');
             const daysOfWeek = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
             let dayOptions = daysOfWeek.map(d => `<option value="${d}" ${student.day === d ? 'selected' : ''}>${d}</option>`).join('');
@@ -1193,7 +1228,6 @@
             `;
         }
         
-        // YENİ: Oda Ekle/Düzenle Modal HTML'i
         function getRoomFormHTML(room = {}) {
             const isEditing = !!room.id;
             const title = isEditing ? 'Oda Bilgilerini Düzenle' : 'Yeni Oda Ekle';
@@ -1399,7 +1433,7 @@
         function generateStudentInfoHTML(studentId) {
             const student = state.students.find(s => s.id == studentId);
             const course = state.courses.find(c => c.id === student.courseId);
-            const room = state.rooms.find(r => r.id === student.roomId); // YENİ
+            const room = state.rooms.find(r => r.id === student.roomId);
             if (!student || !course) return "<p>Öğrenci bilgileri bulunamadı.</p>";
 
             const balance = (student.payments || []).reduce((sum, p) => sum + p.amount, 0);
@@ -1437,7 +1471,8 @@
                         <p><strong>Adı Soyadı:</strong> ${student.firstName} ${student.lastName}</p>
                         <p><strong>Kurs:</strong> ${course.name}</p>
                         <p><strong>Ders Programı:</strong> ${student.day} günleri, saat ${student.time}</p>
-                        <p><strong>Oda:</strong> ${room ? room.name : 'Belirtilmemiş'}</p> </section>
+                        <p><strong>Oda:</strong> ${room ? room.name : 'Belirtilmemiş'}</p>
+                    </section>
                     
                     <section style="margin-bottom: 20px;">
                         <h2 style="border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px;">Devam Geçmişi</h2>
@@ -1480,14 +1515,12 @@
             if (link) {
                 const pageId = link.getAttribute('href').substring(1);
                 showPage(pageId);
-                // Close menu on mobile after navigation
                  if (window.innerWidth < 768) {
                     toggleMenu();
                 }
             }
         }
         
-        // GÜNCELLENDİ: Öğrenci Formu Gönderimi (Oda Çakışma Kontrolü)
         async function handleStudentFormSubmit(e) {
             e.preventDefault();
             const form = e.target.closest('form');
@@ -1497,12 +1530,11 @@
             studentData.courseId = studentData.courseId;
             studentData.fee = parseFloat(studentData.fee);
             studentData.lessonsPerFee = parseInt(studentData.lessonsPerFee);
-            studentData.roomId = studentData.roomId; // YENİ: roomId'yi al
+            studentData.roomId = studentData.roomId;
 
             const course = state.courses.find(c => c.id === studentData.courseId);
             const activeStudents = state.students.filter(s => s.status === 'active');
             
-            // Kursun kendi kontenjan kontrolü
             const studentsInSlot = activeStudents.filter(s => s.id != id && s.courseId === studentData.courseId && s.day === studentData.day && s.time === studentData.time);
 
             if (course && studentsInSlot.length >= course.quota) {
@@ -1510,7 +1542,6 @@
                 return;
             }
             
-            // YENİ: ODA ÇAKIŞMA KONTROLÜ
             const room = state.rooms.find(r => r.id === studentData.roomId);
             const roomCapacity = room ? room.capacity : 0;
             const studentsInRoomAtTime = activeStudents.filter(s => 
@@ -1567,7 +1598,6 @@
             }
         }
         
-        // YENİ: Oda formunu işle
         async function handleRoomFormSubmit(e) {
             e.preventDefault();
             const form = e.target;
@@ -1608,16 +1638,16 @@
                 try {
                     await db.collection('students').doc(studentId).update({ payments: updatedPayments });
                     const updatedStudent = { ...student, payments: updatedPayments };
-                    showModal(getPaymentFormHTML(updatedStudent)); // Modalı yeniden render et
+                    showModal(getPaymentFormHTML(updatedStudent));
                     
-                    const newFeedbackEl = document.getElementById('payment-feedback'); // Yeni feedback el'i bul
+                    const newFeedbackEl = document.getElementById('payment-feedback');
                     if (newFeedbackEl) {
                         newFeedbackEl.textContent = `${student.firstName} ${student.lastName} - ${amount.toFixed(2)} ₺ ödeme eklendi.`;
                         newFeedbackEl.classList.add('text-green-600');
                     }
                 } catch(error) {
                     console.error("Ödeme eklenemedi:", error);
-                     if (feedbackEl) { // Hata durumunda eski el'i kullan (veya yenisini bul)
+                     if (feedbackEl) {
                         feedbackEl.textContent = 'Bir hata oluştu!';
                         feedbackEl.classList.add('text-red-600');
                      }
@@ -1669,17 +1699,17 @@
                 });
 
                 const updatedStudent = { ...student, attendance: newAttendance, payments: newPayments };
-                showModal(getStudentStatusModalHTML(updatedStudent)); // Modalı yeniden render et
+                showModal(getStudentStatusModalHTML(updatedStudent));
 
                 if (status === 'geldi' || status === 'gelmedi') {
-                    const newFeedbackEl = document.getElementById('attendance-feedback'); // Yeni feedback el'i bul
+                    const newFeedbackEl = document.getElementById('attendance-feedback');
                     if (newFeedbackEl) {
                         let statusText = status === 'geldi' ? 'Geldi' : 'Gelmedi';
                         newFeedbackEl.textContent = `${student.firstName} - ${statusText} olarak kaydedildi.`;
                         newFeedbackEl.classList.add('text-green-600');
                         newFeedbackEl.classList.remove('text-red-600');
                     }
-                } else { // Telafi için
+                } else {
                     hideModal();
                 }
             } catch (error) {
@@ -1775,7 +1805,6 @@
             hideModal();
         }
 
-        // GÜNCELLENDİ: Tablo Tıklamaları (Oda yönetimi eklendi)
         async function handleTableClicks(e) {
             const target = e.target.closest('button, a');
             if (!target) return;
@@ -1815,23 +1844,19 @@
             if (target.classList.contains('delete-course-btn')) {
                 if (confirm('Bu kursu silmek, kayıtlı TÜM öğrencileri de silecektir. Emin misiniz?')) {
                     loadingOverlay.classList.remove('hidden');
-                    // İlgili öğrencileri bul ve sil
                     const studentDocs = await db.collection('students').where('courseId', '==', id).get();
                     const batch = db.batch();
                     studentDocs.forEach(doc => batch.delete(doc.ref));
                     await batch.commit();
-                    // Kursu sil
                     await db.collection('courses').doc(id).delete();
                     loadingOverlay.classList.add('hidden');
                 }
             }
-            // YENİ ODA BUTONLARI
             if (target.classList.contains('edit-room-btn')) {
                 const room = state.rooms.find(r => r.id == id);
                 if (room) showModal(getRoomFormHTML(room));
             }
             if (target.classList.contains('delete-room-btn')) {
-                // Odayı silmeden önce kullanan öğrenci var mı kontrol et
                 const studentsInRoom = state.students.filter(s => s.roomId === id).length;
                 if (studentsInRoom > 0) {
                     alert('Bu odaya atanmış öğrenciler varken odayı silemezsiniz. Lütfen önce öğrencilerin odasını değiştirin.');
@@ -1843,7 +1868,6 @@
                     loadingOverlay.classList.add('hidden');
                 }
             }
-            // BİTİŞ
             if (target.classList.contains('add-payment-btn')) {
                 const student = state.students.find(s => s.id == id);
                 if (student) showModal(getPaymentFormHTML(student));
@@ -1916,7 +1940,7 @@
         document.querySelector('aside nav').addEventListener('click', handleNavigation);
         document.getElementById('add-student-btn').addEventListener('click', () => showModal(getStudentFormHTML()));
         document.getElementById('add-course-btn').addEventListener('click', () => showModal(getCourseFormHTML()));
-        document.getElementById('add-room-btn').addEventListener('click', () => showModal(getRoomFormHTML())); // YENİ
+        document.getElementById('add-room-btn').addEventListener('click', () => showModal(getRoomFormHTML()));
         
         menuBtn.addEventListener('click', toggleMenu);
         menuOverlay.addEventListener('click', toggleMenu);
@@ -1934,7 +1958,7 @@
             renderCalendar();
         });
 
-        // YENİ: Takvim görünüm değiştirme butonu
+        // GÜNCELLENDİ: Takvim görünüm değiştirme butonu
         document.getElementById('calendar-view-toggle').addEventListener('click', (e) => {
             const btn = e.target;
             const currentView = btn.dataset.view;
@@ -1951,7 +1975,7 @@
                 btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
             }
             
-            renderCalendar(); // Görünümü yeniden render et
+            renderCalendar(); // Görünümü ve filtreleri yeniden render et
         });
 
         document.getElementById('student-search').addEventListener('input', renderStudentsPage);
@@ -1973,6 +1997,7 @@
         document.getElementById('payment-status-filter').addEventListener('change', applyPaymentFilters);
 
         document.getElementById('calendar-course-filter').addEventListener('change', renderCalendar);
+        document.getElementById('calendar-room-filter').addEventListener('change', renderCalendar); // YENİ
         document.getElementById('download-pdf-btn').addEventListener('click', handleDownloadPDF);
 
         // Raporlar Sayfası için Event Listener
@@ -2050,7 +2075,6 @@
             }
         });
         
-        // GÜNCELLENDİ: Modal Form Gönderimi (Oda formu eklendi)
         modalContent.addEventListener('submit', (e) => {
             e.preventDefault(); 
             e.stopPropagation();
@@ -2071,8 +2095,7 @@
                     const course = state.courses.find(c => c.id === student.courseId);
                     if (!course) return;
 
-                    // ODA KONTROLÜ (Telafi için)
-                    const telafiRoom = state.rooms.find(r => r.id === student.roomId); // Telafiyi öğrencinin kendi odasına atıyoruz
+                    const telafiRoom = state.rooms.find(r => r.id === student.roomId);
                     const roomCapacity = telafiRoom ? telafiRoom.capacity : 0;
                     
                     const activeStudents = state.students.filter(s => s.status === 'active');
@@ -2106,7 +2129,7 @@
                 handleStudentFormSubmit(e);
             } else if (e.target.id === 'course-form') {
                 handleCourseFormSubmit(e);
-            } else if (e.target.id === 'room-form') { // YENİ
+            } else if (e.target.id === 'room-form') {
                 handleRoomFormSubmit(e);
             } else if (e.target.id === 'payment-form') {
                 handlePaymentFormSubmit(e);
@@ -2137,13 +2160,11 @@
 
         auth.onAuthStateChanged(user => {
             if (user) {
-                // Kullanıcı giriş yaptı
                 loginScreen.classList.add('hidden');
                 appContainer.classList.remove('hidden');
                 loadData();
                 showPage('dashboard');
             } else {
-                // Kullanıcı çıkış yaptı
                 appContainer.classList.add('hidden');
                 loginScreen.classList.remove('hidden');
                 loadingOverlay.classList.add('hidden');
@@ -2172,7 +2193,6 @@
         }
 
         function handleDownloadPDF() {
-            // PDF DEĞİL, YAZDIRMA İŞLEVİ
             const filters = {
                 name: document.getElementById('student-search').value,
                 courseId: document.getElementById('student-course-filter').value,
@@ -2206,14 +2226,15 @@
 
             const tableBody = filteredStudents.map(student => {
                 const course = state.courses.find(c => c.id === student.courseId);
-                const room = state.rooms.find(r => r.id === student.roomId); // YENİ
+                const room = state.rooms.find(r => r.id === student.roomId);
                 return `
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 6px;">${course ? course.instructor : 'N/A'}</td>
                         <td style="border: 1px solid #ddd; padding: 6px;">${student.firstName} ${student.lastName}</td>
                         <td style="border: 1px solid #ddd; padding: 6px;">${course ? course.name : 'N/A'}</td>
                         <td style="border: 1px solid #ddd; padding: 6px;">${student.day} ${student.time}</td>
-                        <td style="border: 1px solid #ddd; padding: 6px;">${room ? room.name : 'N/A'}</td> </tr>
+                        <td style="border: 1px solid #ddd; padding: 6px;">${room ? room.name : 'N/A'}</td>
+                    </tr>
                 `;
             }).join('');
 
@@ -2230,7 +2251,7 @@
             html += `<p style="font-size: 11px; text-align: center; margin-bottom: 15px;">Tarih: ${date}</p>`;
             html += `<table style="width: 100%; border-collapse: collapse; font-size: 10px;">`;
             html += '<thead><tr>';
-            const head = ['Eğitmen', 'Öğrenci Adı Soyadı', 'Kurs', 'Ders Günü ve Saati', 'Oda']; // YENİ
+            const head = ['Eğitmen', 'Öğrenci Adı Soyadı', 'Kurs', 'Ders Günü ve Saati', 'Oda'];
             head.forEach(h => {
                 html += `<th style="border: 1px solid #ddd; padding: 6px; background-color: #f2f2f2; text-align: left;">${h}</th>`;
             });
@@ -2251,27 +2272,20 @@
         function handlePrintReportsPage() {
             const reportPage = document.getElementById('reports-page');
             if (!reportPage) return;
-
-            // Rapor sayfasını klonla
             const reportContent = reportPage.cloneNode(true);
-            
-            // Klonlanan içerikten butonları ve gereksiz öğeleri kaldır
             reportContent.querySelector('button#print-reports-page-btn').remove();
             const dateFilters = reportContent.querySelector('.flex.flex-col.md\\:flex-row.gap-4.mb-4');
             if(dateFilters) dateFilters.remove();
             
             const printArea = document.getElementById('print-area');
-            printArea.innerHTML = ''; // Önceki içeriği temizle
-            printArea.appendChild(reportContent); // Klonu ekle
+            printArea.innerHTML = '';
+            printArea.appendChild(reportContent);
             
             printArea.classList.remove('hidden');
             doc.save('kurs_ogrenci_listesi.pdf');
         }
 
-        // --- Raporlama Fonksiyonları ---
-
         function renderReportsPage() {
-            // Set default dates (this month)
             const endDateInput = document.getElementById('report-end-date');
             const startDateInput = document.getElementById('report-start-date');
             
@@ -2282,11 +2296,7 @@
                 const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
                 startDateInput.valueAsDate = startOfMonth;
             }
-
-            // Initial report generation
             handleGenerateReport();
-
-            // Render reports that don't depend on date range
             renderStudentReports();
             renderOperationalReports();
         }
@@ -2296,7 +2306,7 @@
             const endDate = document.getElementById('report-end-date').valueAsDate;
             
             if (endDate) {
-                endDate.setHours(23, 59, 59, 999); // Include the whole end day
+                endDate.setHours(23, 59, 59, 999);
             }
 
             renderFinancialReports(startDate, endDate);
@@ -2316,7 +2326,7 @@
                 }
 
                 (student.payments || []).forEach(p => {
-                    if(!p.date) return; // Veri bozuksa atla
+                    if(!p.date) return;
                     const paymentDate = new Date(p.date);
                     if (p.type === 'payment' && (!startDate || paymentDate >= startDate) && (!endDate || paymentDate <= endDate)) {
                         totalRevenue += p.amount;
@@ -2351,10 +2361,9 @@
         }
 
         function renderStudentReports() {
-            // New Students Chart
             const monthlyData = {};
             state.students.forEach(s => {
-                if (!s.registrationDate) return; // Veri bozuksa atla
+                if (!s.registrationDate) return;
                 const regDate = new Date(s.registrationDate);
                 const monthYear = `${regDate.getFullYear()}-${String(regDate.getMonth() + 1).padStart(2, '0')}`;
                 if (!monthlyData[monthYear]) {
@@ -2398,7 +2407,6 @@
                 }
             });
 
-            // Absenteeism Report
             const absenteeismBody = document.getElementById('report-absenteeism-body');
             absenteeismBody.innerHTML = '';
             const activeStudents = state.students.filter(s => s.status === 'active');
@@ -2425,7 +2433,6 @@
         }
 
         function renderOperationalReports() {
-            // Course Popularity
             const popularityBody = document.getElementById('report-course-popularity-body');
             popularityBody.innerHTML = '';
             const activeStudents = state.students.filter(s => s.status === 'active');
@@ -2450,7 +2457,6 @@
                 });
             }
 
-            // Instructor Workload
             const workloadBody = document.getElementById('report-instructor-workload-body');
             workloadBody.innerHTML = '';
             const workload = {};
@@ -2487,7 +2493,6 @@
             const doc = new jsPDF();
             doc.setFont('LiberationSans-Regular');
 
-            // 1. Get Title & Dates
             const startDate = document.getElementById('report-start-date').value;
             const endDate = document.getElementById('report-end-date').value;
             doc.setFontSize(18);
@@ -2495,21 +2500,19 @@
             doc.setFontSize(11);
             doc.text(`Tarih Aralığı: ${startDate} - ${endDate}`, 14, 28);
 
-            // 2. Get Summary Data
             const totalRevenue = document.getElementById('report-total-revenue').textContent;
             const totalDue = document.getElementById('report-total-due').textContent;
             doc.setFontSize(12);
             doc.text(`Toplam Gelir (Seçili Aralık): ${totalRevenue}`, 14, 40);
             doc.text(`Toplam Alacak (Tüm Aktif Öğrenciler): ${totalDue}`, 14, 46);
 
-            // 3. Get Table Data (Helper function to read from table)
             const getTableData = (tableBodyId) => {
                 const table = document.getElementById(tableBodyId);
                 const body = [];
                 table.querySelectorAll('tr').forEach(tr => {
                     const row = [];
                     tr.querySelectorAll('td').forEach(td => row.push(td.textContent));
-                    if(row.length > 0 && !tr.querySelector('.text-gray-500')) { // "Kayıt bulunamadı" satırlarını atla
+                    if(row.length > 0 && !tr.querySelector('.text-gray-500')) {
                         body.push(row);
                     }
                 });
@@ -2522,7 +2525,6 @@
                 styles: { font: 'LiberationSans-Regular' }
             };
 
-            // 4. Add Tables to PDF
             doc.autoTable({
                 startY: 55,
                 head: [['Kurs', 'Toplam Gelir']],
@@ -2551,7 +2553,6 @@
                 ...tableStyles
             });
 
-            // 5. Save
             doc.save('yonetim_raporu.pdf');
         }
 
