@@ -13,7 +13,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
- <script src="https://raw.githack.com/parallax/jsPDF/master/examples/fonts/LiberationSans-Regular-normal.js"></script>
+    <script src="https://raw.githack.com/parallax/jsPDF/master/examples/fonts/LiberationSans-Regular-normal.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -98,7 +98,8 @@
                     <i class="fas fa-bars fa-lg"></i>
                 </button>
                 <h1 class="text-xl font-bold text-gray-800">Alegori Sanat Evi</h1>
-                <div class="w-8"></div> </header>
+                <div class="w-8"></div>
+            </header>
 
             <main class="flex-1 p-6 md:p-10 overflow-y-auto">
                 <div id="dashboard-page" class="page">
@@ -197,7 +198,7 @@
                                 <tr>
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Kurs Adı</th>
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Eğitmen</th>
-                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Süre (dk)</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Oda</th>
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Kontenjan</th>
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Kayıtlı Öğrenci</th>
                                     <th class="p-4 text-center text-sm font-semibold text-gray-600">İşlemler</th>
@@ -273,7 +274,7 @@
                         <div class="flex items-center gap-4">
                             <select id="calendar-course-filter" class="p-2 border rounded-md w-full md:w-48"></select>
                             <select id="calendar-room-filter" class="p-2 border rounded-md w-full md:w-48 hidden">
-                                </select>
+                            </select>
                             <button id="calendar-view-toggle" data-view="course" class="px-3 py-2 text-sm bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 whitespace-nowrap">
                                 Oda Bazlı Göster
                             </button>
@@ -283,12 +284,12 @@
                     <div id="calendar-view-course">
                         <div class="bg-white p-2 rounded-lg shadow-md overflow-x-auto">
                             <div id="calendar-grid" class="grid" style="min-width: 800px;">
-                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <div id="calendar-view-room" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        </div>
+                    </div>
                 </div>
                 
                 <div id="reports-page" class="page">
@@ -330,7 +331,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="report-revenue-by-course-body">
-                                    </tbody>
+                                </tbody>
                             </table>
                         </div>
                     </section>
@@ -352,7 +353,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="report-absenteeism-body">
-                                        </tbody>
+                                    </tbody>
                                 </table>
                             </div>
                         </section>
@@ -369,7 +370,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="report-course-popularity-body">
-                                        </tbody>
+                                    </tbody>
                                 </table>
                             </div>
                             <h3 class="text-xl font-semibold text-gray-600 mb-2">Eğitmen Ders Yükü (Aktif Öğrenci)</h3>
@@ -382,7 +383,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="report-instructor-workload-body">
-                                        </tbody>
+                                    </tbody>
                                 </table>
                             </div>
                         </section>
@@ -394,66 +395,44 @@
                         <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">Kullanım Kılavuzu</h1>
                         
                         <section class="mb-8">
-                            <h2 class="text-2xl font-bold text-gray-700 mb-4">1. Öğrenci Yönetimi</h2>
-                            <p class="mb-4">Bu sayfa, tüm öğrenci kayıtlarınızı yönettiğiniz ana merkezdir.</p>
-                            
-                            <h3 class="text-xl font-semibold text-gray-600 mb-2">Yeni Öğrenci Ekleme</h3>
-                            <ol class="list-decimal list-inside space-y-2 mb-4">
-                                <li>Sağ üstteki <strong class="text-indigo-600">"Yeni Öğrenci Ekle"</strong> butonuna tıklayın.</li>
-                                <li>Açılan formda öğrencinin bilgilerini doldurun:
-                                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
-                                        <li><strong>Ad, Soyad, İletişim Bilgileri:</strong> Temel öğrenci bilgilerini girin.</li>
-                                        <li><strong>Kurs Seçimi:</strong> Öğrencinin kayıt olacağı kursu listeden seçin.</li>
-                                        <li><strong>Dönem Ücreti ve Ders Sayısı:</strong> Öğrenciden alacağınız ücreti ve bu ücretin kaç dersi kapsadığını belirtin (Örn: 400 TL, 4 ders).</li>
-                                        <li><strong>Ders Günü ve Saati:</strong> Öğrencinin sabit ders programını belirleyin.</li>
-                                        <li><strong>Oda:</strong> (Yeni) Dersin yapılacağı odayı seçin. Sistem, o odanın kapasitesi ve programına göre çakışmaları engelleyecektir.</li>
-                                    </ul>
-                                </li>
-                                <li><strong class="text-indigo-600">"Kaydet"</strong> butonuna basın. Kayıtla birlikte öğrencinin bakiyesine belirlediğiniz dönem ücreti borç olarak yansıtılacaktır.</li>
-                            </ol>
-
-                            <h3 class="text-xl font-semibold text-gray-600 mb-2">Öğrenci Bilgilerini Düzenleme ve İşlemler</h3>
-                            <ul class="list-disc list-inside space-y-2">
-                                <li><strong>İsme Tıklama (Devam İşlemleri):</strong> Bir öğrencinin ismine tıkladığınızda "Devam Durumu" penceresi açılır. Buradan <strong class="text-green-600">Geldi/Gelmedi</strong>, <strong class="text-yellow-600">Telafi</strong>, <strong class="text-blue-600">Aktif/Pasif</strong> durumu ve devam kaydı silme gibi işlemleri yapabilirsiniz.</li>
-                                <li><strong>İşlem Butonları:</strong> Her öğrenci satırının sonunda bulunan ikonlarla öğrenciyi düzenleyebilir, silebilir, bilgilerini WhatsApp/E-posta ile gönderebilir veya yazdırabilirsiniz.</li>
-                            </ul>
+                            <h2 class="text-2xl font-bold text-gray-700 mb-4">1. Oda Yönetimi (ÖNEMLİ)</h2>
+                            <p class="mb-4">Sistemi kullanmaya başlamadan önce ilk adımınız "Odalar" sayfasından dersliklerinizi (Atölye 1, Piyano Odası vb.) ve kapasitelerini tanımlamaktır.</p>
                         </section>
 
                         <section class="mb-8">
                             <h2 class="text-2xl font-bold text-gray-700 mb-4">2. Kurs Yönetimi</h2>
+                            <p class="mb-4">Artık kurs oluşturmak bir "sınıf" oluşturmak anlamına gelir.</p>
                             <ul class="list-disc list-inside space-y-2">
-                                <li><strong>Yeni Kurs Ekleme:</strong> Sağ üstteki butona tıklayarak kursun adını, eğitmenini ve ders kontenjanını (maksimum öğrenci sayısı) girin.</li>
-                                <li><strong>Düzenleme ve Silme:</strong> Listeden bir kursu güncelleyebilir veya silebilirsiniz. <strong class="text-red-600">Not:</strong> Bir kursu silmek, o kursa kayıtlı tüm öğrencileri de kalıcı olarak silecektir.</li>
-                            </ul>
-                        </section>
-                        
-                        <section class="mb-8">
-                            <h2 class="text-2xl font-bold text-gray-700 mb-4">3. Oda Yönetimi</h2>
-                            <ul class="list-disc list-inside space-y-2">
-                                <li>Fiziksel odalarınızı (Atölye 1, Müzik Odası vb.) ve bu odaların maksimum öğrenci kapasitesini buradan tanımlayın.</li>
-                                <li>Bir odayı silmek için, o odaya atanmış aktif bir öğrenci olmamalıdır.</li>
+                                <li><strong>Yeni Kurs Ekleme:</strong> "Yeni Kurs Ekle" butonuna tıklayın.</li>
+                                <li>Kursun adını (örn: "Piyano - A"), eğitmenini ve kontenjanını girin.</li>
+                                <li><strong class="text-indigo-600">En önemlisi:</strong> O kursun hangi odada yapılacağını "Atanacak Oda" listesinden seçin.</li>
+                                <li>Eğer aynı saatte iki farklı piyano dersi açacaksanız, iki ayrı kurs oluşturmalısınız (örn: "Piyano - A" -> Oda 1; "Piyano - B" -> Oda 2).</li>
                             </ul>
                         </section>
 
                         <section class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-700 mb-4">3. Öğrenci Yönetimi</h2>
+                            <h3 class="text-xl font-semibold text-gray-600 mb-2">Yeni Öğrenci Ekleme</h3>
+                            <ol class="list-decimal list-inside space-y-2 mb-4">
+                                <li>"Yeni Öğrenci Ekle" butonuna tıklayın.</li>
+                                <li><strong class="text-indigo-600">Kurs (ve Odası)</strong> listesinden öğrencinin kaydolacağı sınıfı seçin (örn: "Piyano - A (Oda 1)").</li>
+                                <li>Oda seçimi artık otomatiktir. Sadece kursu seçmeniz yeterlidir.</li>
+                                <li>Öğrencinin sabit ders gününü ve saatini belirleyin.</li>
+                                <li><strong class="text-indigo-600">"Kaydet"</strong> butonuna basın. Sistem, hem o kursun kontenjanını hem de o odanın kapasitesini aynı anda kontrol ederek çakışmaları engelleyecektir.</li>
+                            </ol>
+                        </section>
+
+                        <section class="mb-8">
                             <h2 class="text-2xl font-bold text-gray-700 mb-4">4. Ödeme Takibi</h2>
-                            <ul class="list-disc list-inside space-y-2">
-                                <li><strong>Filtreleme:</strong> Öğrencileri isme, kursa veya ödeme durumuna ("Borçlu" / "Borcu Yok") göre listeleyebilirsiniz.</li>
-                                <li><strong>Ödeme Ekleme:</strong> Bir öğrencinin satırındaki <strong class="text-yellow-600">"Ödeme Ekle"</strong> butonuna tıklayın. Açılan pencerede alınan ödeme tutarını girip kaydedin. Tutar, öğrencinin bakiyesinden otomatik olarak düşülecektir.</li>
-                             </ul>
+                            <p>Bu bölüm eskisi gibi çalışmaya devam etmektedir.</p>
                         </section>
 
                         <section>
                             <h2 class="text-2xl font-bold text-gray-700 mb-4">5. Ders Programı (Takvim)</h2>
                             <ul class="list-disc list-inside space-y-2">
-                                <li><strong>Haftalık Gezinme:</strong> Takvimin üstündeki okları ve "Bugün" butonunu kullanarak haftalar arasında gezinebilirsiniz.</li>
-                                <li><strong>Görünüm Değiştirme:</strong> Sağ üstteki <strong class="text-blue-600">"Oda Bazlı Göster"</strong> / <strong class="text-green-600">"Kurs Bazlı Göster"</strong> butonu ile takvim görünümünü değiştirebilirsiniz.
-                                    <ul class="list-disc list-inside ml-4 mt-1">
-                                        <li><strong>Kurs Bazlı:</strong> Tüm dersleri tek bir takvimde, kursa göre filtrelenebilir şekilde gösterir.</li>
-                                        <li><strong>Oda Bazlı:</strong> Artık bir "Oda Filtresi"ne sahiptir. "Tüm Odalar"ı veya sadece belirli bir odayı listeleyebilirsiniz.</li>
-                                    </ul>
-                                </li>
-                                <li><strong>Hızlı İşlem:</strong> Takvimdeki bir derse tıkladığınızda, ilgili öğrencinin devam durumunu ("Geldi", "Gelmedi") işleyebileceğiniz pencere açılır.</li>
+                                <li><strong>Görünüm Değiştirme:</strong> "Oda Bazlı Göster" / "Kurs Bazlı Göster" butonu ile iki görünüm arasında geçiş yapabilirsiniz.</li>
+                                <li><strong>Kurs Bazlı:</strong> Tüm dersleri tek bir takvimde, kursa göre filtrelenebilir şekilde gösterir.</li>
+                                <li><strong>Oda Bazlı:</strong> "Tüm Odalar"ı veya sadece belirli bir odayı listeleyebilirsiniz.</li>
                             </ul>
                         </section>
 
