@@ -1,4 +1,3 @@
-// --- Firebase Proje Ayarları Netlify tarafından güvenli bir şekilde eklenecek ---
 const firebaseConfig = {
   apiKey: "AIzaSyAh2z7aQRYKfJSjRgiakOj_w8bDZp0crMI",
   authDomain: "kursyonetim-f6ebc.firebaseapp.com",
@@ -1281,6 +1280,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!student || !student.phone) {
             document.getElementById('send-error').textContent = 'Öğrencinin telefon numarası kayıtlı değil.';
             return;
+          // 1. Telefondaki tüm harf, boşluk, parantez vb. temizle
+    let internationalPhone = student.phone.replace(/\D/g, ''); 
+
+    // 2. Numara "0" ile başlıyorsa (0532...) başındaki 0'ı at
+    if (internationalPhone.startsWith('0')) {
+        internationalPhone = internationalPhone.substring(1); 
+    }
+
+    // 3. Numaranın başında 90 yoksa ekle (Türkiye ülke kodu)
+    if (!internationalPhone.startsWith('90')) {
+        internationalPhone = '90' + internationalPhone;
+    }
         }
         const message = generateStudentInfoText(studentId);
         const encodedMessage = encodeURIComponent(message);
