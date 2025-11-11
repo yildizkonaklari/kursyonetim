@@ -1307,7 +1307,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         const message = generateStudentInfoText(studentId);
-        const encodedMessage = encodeURIComponent(message);
         const subject = encodeURIComponent('Alegori Sanat Evi - Öğrenci Bilgilendirmesi');
         const body = encodeURIComponent(message);
         window.location.href = `mailto:${student.email}?subject=${subject}&body=${body}`;
