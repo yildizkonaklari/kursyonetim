@@ -592,69 +592,72 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // GÜNCELLENDİ: getStudentFormHTML (Oda seçimi kaldırıldı)
     function getStudentFormHTML(student = {}) {
-        const isEditing = !!student.id;
-        const title = isEditing ? 'Öğrenci Bilgilerini Düzenle' : 'Yeni Öğrenci Ekle';
-        
-        // Kurs seçeneklerini ve hangi odaya bağlı olduklarını göster
-        let courseOptions = state.courses.map(c => {
-            const room = state.rooms.find(r => r.id === c.roomId);
-            const roomName = room ? room.name : 'Oda Atanmamış';
-            return `<option value="${c.id}" ${student.courseId == c.id ? 'selected' : ''}>${c.name} (${roomName})</option>`;
-        }).join('');
-        
-        const daysOfWeek = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
-        let dayOptions = daysOfWeek.map(d => `<option value="${d}" ${student.day === d ? 'selected' : ''}>${d}</option>`).join('');
-        
-        return `
-            <div>
-                <h2 class="text-2xl font-bold mb-6">${title}</h2>
-            </div>
-            <div>
-                <form id="student-form" data-id="${student.id || ''}">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="firstName" placeholder="Ad" value="${student.firstName || ''}" required class="p-2 border rounded">
-                        <input type="text" name="lastName" placeholder="Soyad" value="${student.lastName || ''}" required class="p-2 border rounded">
-                        <input type="tel" name="phone" placeholder="Telefon" value="${student.phone || ''}" class="p-2 border rounded">
-                        <input type="email" name="email" placeholder="E-posta" value="${student.email || ''}" class="p-2 border rounded">
-                         <input type="tel" name="parentPhone" placeholder="Veli Telefon" value="${student.parentPhone || ''}" class="p-2 border rounded">
-                        <input type="email" name="parentEmail" placeholder="Veli E-posta" value="${student.parentEmail || ''}" class="p-2 border rounded">
-                        
-                        <div class="md:col-span-2">
-                           <label class="block text-sm font-medium text-gray-700">Kurs (ve Odası)</label>
-                           <select name="courseId" required class="mt-1 block w-full p-2 border rounded">
-                                <option value="">Kurs Seçin...</option>
-                                ${courseOptions}
-                           </select>
-                        </div>
-
-                        <input type="date" name="registrationDate" value="${student.registrationDate || new Date().toISOString().slice(0,10)}" required class="p-2 border rounded">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Dönem Ücreti</label>
-                            <input type="number" name="fee" placeholder="Ücret (₺)" value="${student.fee || ''}" required class="mt-1 w-full p-2 border rounded">
-                        </div>
-                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Ders Sayısı</label>
-                            <input type="number" name="lessonsPerFee" placeholder="Ücrete dahil ders" value="${student.lessonsPerFee || '4'}" required class="mt-1 w-full p-2 border rounded">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Ders Günü</label>
-                            <select name="day" required class="mt-1 block w-full p-2 border rounded">${dayOptions}</select>
-                        </div>
-                        <div>
-                           <label class="block text-sm font-medium text-gray-700">Ders Saati</label>
-                           <input type="time" name="time" value="${student.time || '09:00'}" required class="mt-1 block w-full p-2 border rounded">
-                        </div>
+    const isEditing = !!student.id;
+    const title = isEditing ? 'Öğrenci Bilgilerini Düzenle' : 'Yeni Öğrenci Ekle';
+    
+    let courseOptions = state.courses.map(c => {
+        const room = state.rooms.find(r => r.id === c.roomId);
+        const roomName = room ? room.name : 'Oda Atanmamış';
+        return `<option value="${c.id}" ${student.courseId == c.id ? 'selected' : ''}>${c.name} (${roomName})</option>`;
+    }).join('');
+    
+    const daysOfWeek = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+    let dayOptions = daysOfWeek.map(d => `<option value="${d}" ${student.day === d ? 'selected' : ''}>${d}</option>`).join('');
+    
+    return `
+        <div>
+            <h2 class="text-2xl font-bold mb-6">${title}</h2>
+        </div>
+        <div>
+            <form id="student-form" data-id="${student.id || ''}">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" name="firstName" placeholder="Ad" value="${student.firstName || ''}" required class="p-2 border rounded">
+                    <input type="text" name="lastName" placeholder="Soyad" value="${student.lastName || ''}" required class="p-2 border rounded">
+                    
+                    <input type="tel" name="phone" placeholder="Telefon (5XX 123 4567)" value="${student.phone || ''}" class="p-2 border rounded">
+                    <input type="email" name="email" placeholder="E-posta" value="${student.email || ''}" class="p-2 border rounded">
+                     
+                    <input type="tel" name="parentPhone" placeholder="Veli Telefonu (5XX 123 4567)" value="${student.parentPhone || ''}" class="p-2 border rounded">
+                    <input type="email" name="parentEmail" placeholder="Veli E-posta" value="${student.parentEmail || ''}" class="p-2 border rounded">
+                    
+                    <div class="md:col-span-2">
+                       <label class="block text-sm font-medium text-gray-700">Kurs (ve Odası)</label>
+                       <select name="courseId" required class="mt-1 block w-full p-2 border rounded">
+                            <option value="">Kurs Seçin...</option>
+                            ${courseOptions}
+                       </select>
                     </div>
-                    <textarea name="notes" placeholder="Özel Notlar..." class="w-full p-2 border rounded mt-4">${student.notes || ''}</textarea>
-                    <p id="form-error" class="text-red-600 text-sm mt-2 text-center h-4"></p>
-                </form>
-            </div>
-            <div class="flex justify-end mt-6 gap-4">
-                <button type="button" id="cancel-modal-btn" class="bg-gray-300 px-4 py-2 rounded">İptal</button>
-                <button type="submit" form="student-form" class="bg-indigo-600 text-white px-4 py-2 rounded">${isEditing ? 'Güncelle' : 'Kaydet'}</button>
-            </div>
-        `;
-    }
+
+                    <input type="date" name="registrationDate" value="${student.registrationDate || new Date().toISOString().slice(0,10)}" required class="p-2 border rounded">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Dönem Ücreti</label>
+                        <input type="number" name="fee" placeholder="Ücret (₺)" value="${student.fee || ''}" required class="mt-1 w-full p-2 border rounded">
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700">Ders Sayısı</label>
+                        <input type="number" name="lessonsPerFee" placeholder="Ücrete dahil ders" value="${student.lessonsPerFee || '4'}" required class="mt-1 w-full p-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Ders Günü</label>
+                        <select name="day" required class="mt-1 block w-full p-2 border rounded">${dayOptions}</select>
+                    </div>
+                    <div>
+                       <label class="block text-sm font-medium text-gray-700">Ders Saati</label>
+                       <input type="time" name="time" value="${student.time || '09:00'}" required class="mt-1 block w-full p-2 border rounded">
+                    </div>
+                </div>
+                <textarea name="notes" placeholder="Özel Notlar..." class="w-full p-2 border rounded mt-4">${student.notes || ''}</textarea>
+            </form>
+        </div>
+        
+        <p id="form-error" class="text-red-600 text-sm mt-4 text-center min-h-[1.25rem]"></p> 
+        
+        <div class="flex justify-end mt-4 gap-4">
+            <button type="button" id="cancel-modal-btn" class="bg-gray-300 px-4 py-2 rounded">İptal</button>
+            <button type="submit" form="student-form" class="bg-indigo-600 text-white px-4 py-2 rounded">${isEditing ? 'Güncelle' : 'Kaydet'}</button>
+        </div>
+    `;
+}
     
     // GÜNCELLENDİ: getCourseFormHTML (Oda seçimi eklendi)
     function getCourseFormHTML(course = {}) {
@@ -1295,8 +1298,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const message = generateStudentInfoText(studentId);
         const encodedMessage = encodeURIComponent(message);
-        window.open(`https://wa.me/${student.phone}?text=${encodedMessage}`, '_blank');
-        hideModal();
+       window.open(`https://wa.me/${internationalPhone}?text=${encodedMessage}`, '_blank'); 
+    hideModal();
     }
 
     function sendViaEmail(studentId) {
