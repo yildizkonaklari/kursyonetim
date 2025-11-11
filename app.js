@@ -772,7 +772,7 @@ function getStudentStatusModalHTML(student) {
     const excusedAbsences = (student.attendance || []).filter(a => a.status === 'izinli').length;
     const makeupsDone = (student.attendance || []).filter(a => a.status === 'telafi').length;
     const makeupRightsRemaining = excusedAbsences - makeupsDone;
-
+    const status = student.status !== 'inactive';
 
     let attendanceHistory = (student.attendance || []).map((a, index) => {
         let statusText = '';
@@ -1288,7 +1288,7 @@ function getStudentStatusModalHTML(student) {
     async function handleStudentStatusToggle(studentId) {
         const student = state.students.find(s => s.id == studentId);
         if (student) {
-            const newStatus = student.status === 'active' ? 'inactive' : 'active';
+            const newStatus = (student.status !== 'inactive') ? 'inactive' : 'active';
             loadingOverlay.classList.remove('hidden');
             try {
                 await db.collection('students').doc(studentId).update({ status: newStatus });
