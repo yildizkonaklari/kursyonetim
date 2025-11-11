@@ -1,4 +1,3 @@
-// --- Firebase Proje Ayarları Netlify tarafından güvenli bir şekilde eklenecek ---
 const firebaseConfig = {
   apiKey: "AIzaSyAh2z7aQRYKfJSjRgiakOj_w8bDZp0crMI",
   authDomain: "kursyonetim-f6ebc.firebaseapp.com",
@@ -760,79 +759,101 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
     
-    function getStudentStatusModalHTML(student) {
-        const balance = (student.payments || []).reduce((sum, p) => sum + p.amount, 0);
-        const sessionCount = (student.attendance || []).filter(a => a.status === 'geldi' || a.status === 'gelmedi').length;
-        const status = student.status === 'active';
+    // app.js dosyanızda bu fonksiyonu bulun ve aşağıdakile değiştirin
 
-        let attendanceHistory = (student.attendance || []).map((a, index) => {
-            let statusText = '';
-            if (a.status === 'geldi') {
-                statusText = 'Geldi';
-            } else if (a.status === 'gelmedi') {
-                statusText = 'Gelmedi';
-            } else if (a.status === 'telafi') {
-                statusText = `Telafi -> ${new Date(a.date).toLocaleDateString('tr-TR')} ${a.time}`;
-            }
-            const originalDate = a.originalDate ? new Date(a.originalDate).toLocaleDateString('tr-TR') : new Date(a.date).toLocaleDateString('tr-TR');
-            return `<li class="flex justify-between items-center py-1 border-b text-sm">
-                        <span>${originalDate}: ${statusText}</span>
-                        <button class="delete-attendance-btn text-red-500 hover:text-red-700 p-1" data-student-id="${student.id}" data-attendance-index="${index}" title="Bu kaydı sil">
-                            <i class="fas fa-trash-alt fa-xs"></i>
-                        </button>
-                    </li>`;
-        }).join('') || '<p class="text-gray-500 text-sm">Devam kaydı bulunmuyor.</p>';
+function getStudentStatusModalHTML(student) {
+    const balance = (student.payments || []).reduce((sum, p) => sum + p.amount, 0);
+    
+    // YENİ MANTIK: Mazeretli (izinli) devamsızlıklar dersten sayılmaz.
+    const chargeableSessions = (student.attendance || []).filter(a => a.status === 'geldi' || a.status === 'gelmedi').length;
+    const sessionCount = chargeableSessions % (student.lessonsPerFee || 1);
 
-        return `
-             <div>
-                <div class="flex justify-between items-start mb-2">
-                    <h2 class="text-2xl font-bold">${student.firstName} ${student.lastName}</h2>
-                    <div class="flex items-center gap-2 cursor-pointer" id="toggle-student-status-btn" data-id="${student.id}">
-                        <span class="text-sm font-medium ${status ? 'text-green-600' : 'text-red-600'}">${status ? 'Aktif' : 'Pasif'}</span>
-                        <div class="relative">
-                            <div class="w-10 h-6 rounded-full shadow-inner ${status ? 'bg-green-500' : 'bg-gray-300'}"></div>
-                            <div class="absolute w-4 h-4 bg-white rounded-full shadow inset-y-0 left-0 my-1 ml-1 transition-transform duration-200 ease-in-out ${status ? 'transform translate-x-4' : ''}"></div>
-                        </div>
+    // YENİ MANTIK: Kullanılmamış mazeretli ders sayısı (telafi hakkı)
+    const excusedAbsences = (student.attendance || []).filter(a => a.status === 'izinli').length;
+    const makeupsDone = (student.attendance || []).filter(a => a.status === 'telafi').length;
+    const makeupRightsRemaining = excusedAbsences - makeupsDone;
+
+
+    let attendanceHistory = (student.attendance || []).map((a, index) => {
+        let statusText = '';
+        let dateText = new Date(a.date).toLocaleDateString('tr-TR');
+        
+        if (a.status === 'geldi') {
+            statusText = 'Geldi';
+        } else if (a.status === 'gelmedi') {
+            statusText = 'Mazeretsiz Gelmedi (Ders Yandı)';
+        } else if (a.status === 'izinli') { // YENİ
+            statusText = 'Mazeretli Gelmedi (Telafi Hakkı)';
+        } else if (a.status === 'telafi') {
+            statusText = `Telafi Yapıldı -> ${dateText} ${a.time}`;
+            dateText = new Date(a.originalDate).toLocaleDateString('tr-TR'); // Telafinin asıl tarihini göster
+        }
+
+        return `<li class="flex justify-between items-center py-1 border-b text-sm">
+                    <span>${dateText}: ${statusText}</span>
+                    <button class="delete-attendance-btn text-red-500 hover:text-red-700 p-1" data-student-id="${student.id}" data-attendance-index="${index}" title="Bu kaydı sil">
+                        <i class="fas fa-trash-alt fa-xs"></i>
+                    </button>
+                </li>`;
+    }).join('') || '<p class="text-gray-500 text-sm">Devam kaydı bulunmuyor.</p>';
+
+    return `
+         <div>
+            <div class="flex justify-between items-start mb-2">
+                <h2 class="text-2xl font-bold">${student.firstName} ${student.lastName}</h2>
+                <div class="flex items-center gap-2 cursor-pointer" id="toggle-student-status-btn" data-id="${student.id}">
+                    <span class="text-sm font-medium ${status ? 'text-green-600' : 'text-red-600'}">${status ? 'Aktif' : 'Pasif'}</span>
+                    <div class="relative">
+                        <div class="w-10 h-6 rounded-full shadow-inner ${status ? 'bg-green-500' : 'bg-gray-300'}"></div>
+                        <div class="absolute w-4 h-4 bg-white rounded-full shadow inset-y-0 left-0 my-1 ml-1 transition-transform duration-200 ease-in-out ${status ? 'transform translate-x-4' : ''}"></div>
                     </div>
                 </div>
-                <p class="mb-4 text-gray-700">Dönemdeki Ders: ${sessionCount % student.lessonsPerFee} / ${student.lessonsPerFee}</p>
+            </div>
+            <p class="mb-1 text-gray-700">Ücretli Dönemdeki Ders: ${sessionCount} / ${student.lessonsPerFee}</p>
+            <p class="mb-4 font-semibold ${makeupRightsRemaining > 0 ? 'text-blue-600' : 'text-gray-600'}">Kalan Telafi Hakkı: ${makeupRightsRemaining}</p>
+        </div>
+
+        <div>
+            <div class="bg-gray-100 p-4 rounded-lg mb-4 flex justify-between">
+                <span>Güncel Bakiye:</span> <strong class="${balance < 0 ? 'text-red-600' : 'text-green-600'}">${balance.toFixed(2)} ₺</strong>
             </div>
 
-            <div>
-                <div class="bg-gray-100 p-4 rounded-lg mb-4 flex justify-between">
-                    <span>Güncel Bakiye:</span> <strong class="${balance < 0 ? 'text-red-600' : 'text-green-600'}">${balance.toFixed(2)} ₺</strong>
+            <div class="mb-6">
+                <h3 class="font-bold mb-2">Bugünkü Dersi İşle</h3>
+                
+                <div id="attendance-buttons" class="grid grid-cols-2 gap-3">
+                    <button id="record-attendance-geldi" data-id="${student.id}" class="bg-green-500 text-white py-2 rounded hover:bg-green-600">Geldi</button>
+                    <button id="record-attendance-gelmedi" data-id="${student.id}" class="bg-red-500 text-white py-2 rounded hover:bg-red-600">Mazeretsiz Gelmedi</button>
+                    
+                    <button id="record-attendance-izinli" data-id="${student.id}" class="bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600">Mazeretli (İzinli)</button>
+                    
+                    <button id="record-attendance-telafi-btn" data-id="${student.id}" class="bg-blue-500 text-white py-2 rounded hover:bg-blue-600 ${makeupRightsRemaining > 0 ? '' : 'opacity-50 cursor-not-allowed'}" ${makeupRightsRemaining > 0 ? '' : 'disabled'}>
+                        Telafi Planla
+                    </button>
                 </div>
-
-                <div class="mb-6">
-                    <h3 class="font-bold mb-2">Bugünkü Dersi İşle</h3>
-                    <div id="attendance-buttons" class="flex gap-4">
-                        <button id="record-attendance-geldi" data-id="${student.id}" class="flex-1 bg-green-500 text-white py-2 rounded hover:bg-green-600">Geldi</button>
-                        <button id="record-attendance-gelmedi" data-id="${student.id}" class="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600">Gelmedi</button>
-                        <button id="record-attendance-telafi-btn" data-id="${student.id}" class="flex-1 bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600">Telafi</button>
-                    </div>
-                    <div id="attendance-feedback" class="text-center font-medium mt-2 h-5"></div>
-                    <p class="text-xs text-gray-500 mt-2 text-center">Uyarı: Öğrencinin telafi olan dersini gelmedi olarak işaretlemeyiniz. Mazeretsiz gelmeyenler için 'Gelmedi' olarak işleyiniz.</p>
-                </div>
-
-                <form id="telafi-form" class="hidden mt-4 bg-gray-50 p-4 rounded">
-                     <h4 class="font-semibold mb-2">Telafi Dersi Planla</h4>
-                     <div class="flex flex-col sm:flex-row gap-4">
-                         <input type="date" name="telafiDate" required class="p-2 border rounded w-full">
-                         <input type="time" name="telafiTime" required class="p-2 border rounded w-full">
-                     </div>
-                     <p id="telafi-form-error" class="text-red-600 text-sm mt-2 text-center h-4"></p>
-                     <button type="submit" data-id="${student.id}" class="w-full mt-2 bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Telafiyi Kaydet</button>
-                </form>
-
-                <h3 class="font-bold mb-2 mt-6">Devam Geçmişi</h3>
-                <ul>${attendanceHistory}</ul>
+                
+                <div id="attendance-feedback" class="text-center font-medium mt-2 h-5"></div>
             </div>
-            
-            <div class="text-right mt-6">
-                <button type="button" id="cancel-modal-btn" class="bg-gray-300 px-4 py-2 rounded">Kapat</button>
-            </div>
-        `;
-    }
+
+            <form id="telafi-form" class="hidden mt-4 bg-gray-50 p-4 rounded">
+                 <h4 class="font-semibold mb-2">Telafi Dersi Planla</h4>
+                 <div class="flex flex-col sm:flex-row gap-4">
+                     <input type="date" name="telafiDate" required class="p-2 border rounded w-full">
+                     <input type="time" name="telafiTime" required class="p-2 border rounded w-full">
+                 </div>
+                 <p id="telafi-form-error" class="text-red-600 text-sm mt-2 text-center h-4"></p>
+                 <button type="submit" data-id="${student.id}" class="w-full mt-2 bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Telafiyi Kaydet</button>
+            </form>
+
+            <h3 class="font-bold mb-2 mt-6">Devam Geçmişi</h3>
+            <ul>${attendanceHistory}</ul>
+        </div>
+        
+        <div class="text-right mt-6">
+            <button type="button" id="cancel-modal-btn" class="bg-gray-300 px-4 py-2 rounded">Kapat</button>
+        </div>
+    `;
+}
 
     function getSendInfoModalHTML(student) {
         return `
@@ -1147,74 +1168,85 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    async function handleAttendanceUpdate(studentId, status, details = {}) {
-        const student = state.students.find(s => s.id == studentId);
-        if (!student) return;
+   async function handleAttendanceUpdate(studentId, status, details = {}) {
+    const student = state.students.find(s => s.id == studentId);
+    if (!student) return;
 
-        const attendanceButtons = document.getElementById('attendance-buttons');
-        const feedbackEl = document.getElementById('attendance-feedback');
+    const attendanceButtons = document.getElementById('attendance-buttons');
+    const feedbackEl = document.getElementById('attendance-feedback');
 
-        if ((status === 'geldi' || status === 'gelmedi') && attendanceButtons) {
-            Array.from(attendanceButtons.children).forEach(btn => btn.disabled = true);
-        }
-
-        loadingOverlay.classList.remove('hidden');
-        const newAttendance = [...(student.attendance || [])];
-        let newPayments = [...(student.payments || [])];
-        
-        if (status === 'geldi' || status === 'gelmedi') {
-            newAttendance.push({ date: new Date().toISOString(), status });
-
-            const sessionCount = newAttendance.filter(a => a.status === 'geldi' || a.status === 'gelmedi').length;
-            if (sessionCount > 0 && student.lessonsPerFee > 0 && sessionCount % student.lessonsPerFee === 0) {
-                newPayments.push({ amount: -student.fee, date: new Date().toISOString(), type: 'renewal' });
-            }
-        } else if (status === 'telafi') {
-            const { day, time, date } = details;
-            newAttendance.push({ 
-                studentId,
-                status: 'telafi', 
-                originalDate: new Date().toISOString(),
-                date: date,
-                day,
-                time
-            });
-        }
-        
-        try {
-            await db.collection('students').doc(studentId).update({
-                attendance: newAttendance,
-                payments: newPayments
-            });
-
-            const updatedStudent = { ...student, attendance: newAttendance, payments: newPayments };
-            showModal(getStudentStatusModalHTML(updatedStudent));
-
-            if (status === 'geldi' || status === 'gelmedi') {
-                const newFeedbackEl = document.getElementById('attendance-feedback');
-                if (newFeedbackEl) {
-                    let statusText = status === 'geldi' ? 'Geldi' : 'Gelmedi';
-                    newFeedbackEl.textContent = `${student.firstName} - ${statusText} olarak kaydedildi.`;
-                    newFeedbackEl.classList.add('text-green-600');
-                    newFeedbackEl.classList.remove('text-red-600');
-                }
-            } else {
-                hideModal();
-            }
-        } catch (error) {
-            console.error("Devam durumu güncellenemedi: ", error);
-            if (attendanceButtons) {
-                Array.from(attendanceButtons.children).forEach(btn => btn.disabled = false);
-            }
-             if (feedbackEl) {
-                feedbackEl.textContent = 'Bir hata oluştu!';
-                feedbackEl.classList.remove('text-green-600');
-                feedbackEl.classList.add('text-red-600');
-            }
-        } finally {
-            loadingOverlay.classList.add('hidden');
-        }
+    if ((status === 'geldi' || status === 'gelmedi' || status === 'izinli') && attendanceButtons) {
+        Array.from(attendanceButtons.children).forEach(btn => btn.disabled = true);
     }
+
+    loadingOverlay.classList.remove('hidden');
+    const newAttendance = [...(student.attendance || [])];
+    let newPayments = [...(student.payments || [])];
+    
+    // SADECE 'geldi' veya 'gelmedi' (mazeretsiz) durumları ders sayısını etkiler
+    if (status === 'geldi' || status === 'gelmedi') {
+        newAttendance.push({ date: new Date().toISOString(), status });
+
+        // 'izinli' ve 'telafi' dersleri bu sayıma dahil EDİLMEZ
+        const sessionCount = newAttendance.filter(a => a.status === 'geldi' || a.status === 'gelmedi').length;
+        if (sessionCount > 0 && student.lessonsPerFee > 0 && sessionCount % student.lessonsPerFee === 0) {
+            newPayments.push({ amount: -student.fee, date: new Date().toISOString(), type: 'renewal' });
+        }
+    
+    } else if (status === 'izinli') { // YENİ DURUM
+        newAttendance.push({ date: new Date().toISOString(), status: 'izinli' });
+        // Bu durum ders sayısını veya ödemeyi etkilemez.
+    
+    } else if (status === 'telafi') {
+        const { day, time, date } = details;
+        newAttendance.push({ 
+            studentId,
+            status: 'telafi', 
+            originalDate: new Date().toISOString(), // Telafinin hangi gün planlandığı
+            date: date, // Telafinin yapılacağı gün
+            day,
+            time
+        });
+    }
+    
+    try {
+        await db.collection('students').doc(studentId).update({
+            attendance: newAttendance,
+            payments: newPayments
+        });
+
+        const updatedStudent = { ...student, attendance: newAttendance, payments: newPayments };
+        showModal(getStudentStatusModalHTML(updatedStudent)); // Modalı yeniden render et
+
+        if (status === 'geldi' || status === 'gelmedi' || status === 'izinli') {
+            const newFeedbackEl = document.getElementById('attendance-feedback');
+            if (newFeedbackEl) {
+                let statusText = '';
+                if (status === 'geldi') statusText = 'Geldi';
+                if (status === 'gelmedi') statusText = 'Mazeretsiz Gelmedi';
+                if (status === 'izinli') statusText = 'Mazeretli (İzinli)';
+                
+                newFeedbackEl.textContent = `${student.firstName} - "${statusText}" olarak kaydedildi.`;
+                newFeedbackEl.classList.add('text-green-600');
+                newFeedbackEl.classList.remove('text-red-600');
+            }
+        } else { // Telafi için
+            hideModal();
+        }
+    } catch (error) {
+        console.error("Devam durumu güncellenemedi: ", error);
+        if (attendanceButtons) {
+            Array.from(attendanceButtons.children).forEach(btn => btn.disabled = false);
+        }
+         if (feedbackEl) {
+            feedbackEl.textContent = 'Bir hata oluştu!';
+            feedbackEl.classList.remove('text-green-600');
+            feedbackEl.classList.add('text-red-600');
+        }
+    } finally {
+        loadingOverlay.classList.add('hidden');
+    }
+}
     
     async function handleAttendanceDelete(studentId, attendanceIndex) {
         const student = state.students.find(s => s.id == studentId);
@@ -1548,7 +1580,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (target.id === 'record-attendance-geldi') { e.stopPropagation(); handleAttendanceUpdate(studentId, 'geldi'); }
         if (target.id === 'record-attendance-gelmedi') { e.stopPropagation(); handleAttendanceUpdate(studentId, 'gelmedi'); }
-        if (target.id === 'record-attendance-telafi-btn') { e.stopPropagation(); document.getElementById('telafi-form').classList.toggle('hidden'); }
+      if (target.id === 'record-attendance-izinli') { e.stopPropagation(); handleAttendanceUpdate(studentId, 'izinli'); }  
+      if (target.id === 'record-attendance-telafi-btn') { e.stopPropagation(); document.getElementById('telafi-form').classList.toggle('hidden'); }
         
         if (target.closest('#toggle-student-status-btn')) {
             e.stopPropagation();
