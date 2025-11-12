@@ -66,6 +66,10 @@
                 <a href="#students" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-users w-6 text-center sidebar-icon"></i><span class="ml-3">Öğrenciler</span>
                 </a>
+                
+                <a href="#users" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
+                    <i class="fas fa-user-shield w-6 text-center sidebar-icon"></i><span class="ml-3">Personel</span>
+                </a>
                 <a href="#courses" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-book w-6 text-center sidebar-icon"></i><span class="ml-3">Kurslar</span>
                 </a>
@@ -185,6 +189,30 @@
                     </div>
                 </div>
 
+                <div id="users-page" class="page">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-bold text-gray-800">Personel Yönetimi</h1>
+                        <button id="add-user-btn" class="bg-teal-600 text-white p-2 md:px-4 md:py-2 rounded-lg shadow hover:bg-teal-700 flex items-center">
+                            <i class="fas fa-plus md:mr-2"></i> <span class="hidden md:inline">Yeni Personel Ekle</span>
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+                         <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Ad Soyad</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">E-posta (Giriş)</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Rol</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Telefon</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">İşe Başlama</th>
+                                    <th class="p-4 text-center text-sm font-semibold text-gray-600">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
                 <div id="courses-page" class="page">
                      <div class="flex justify-between items-center mb-6">
                         <h1 class="text-3xl font-bold text-gray-800">Kurs Yönetimi</h1>
@@ -391,117 +419,7 @@
                 </div>
 
                 <div id="how-to-use-page" class="page">
-    <div class="bg-white p-8 rounded-lg shadow-md max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">Kullanım Kılavuzu</h1>
-        
-        <p class="mb-6 text-gray-700">Tebrikler! Kurs Yönetim Sisteminize (KYS) hoş geldiniz. Bu sistem, Excel tabloları ve karmaşık programlarla yaşanan kaosu bitirmek için tasarlandı. En verimli kullanım için lütfen aşağıdaki adımları sırasıyla takip edin.</p>
-
-        <section class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-700 mb-4">🚀 1. Adım: Odalarınızı Tanımlayın (Fiziksel Kurulum)</h2>
-            <p class="mb-4">Sistemi kullanmaya başlamadan önce, kurs merkezinizdeki fiziksel derslikleri tanımlamanız gerekir. Bu, tüm programlamanın temelidir.</p>
-            <ol class="list-decimal list-inside space-y-2">
-                <li>Sol menüden <strong class="text-indigo-600">"Odalar"</strong> sekmesine gidin.</li>
-                <li><strong class="text-indigo-600">"Yeni Oda Ekle"</strong> butonuna tıklayın.</li>
-                <li>Odanızın adını ve <strong class="text-red-600">fiziksel kapasitesini</strong> girin.</li>
-                <li><strong>Örnekler:</strong>
-                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1 text-sm">
-                        <li>Oda Adı: `Piyano Odası 1`, Kapasite: `1`</li>
-                        <li>Oda Adı: `Büyük Atölye`, Kapasite: `10`</li>
-                        <li>Oda Adı: `Keman/Saz Odası`, Kapasite: `2`</li>
-                    </ul>
-                </li>
-            </ol>
-        </section>
-
-        <section class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-700 mb-4">📚 2. Adım: Kurslarınızı Oluşturun (Açılan Sınıflar)</h2>
-            <p class="mb-4">Artık "Kurs" oluşturmak, "Sınıf" açmak anlamına gelir. Her kurs, bir odaya atanmalıdır.</p>
-            <ol class="list-decimal list-inside space-y-2">
-                <li>Sol menüden <strong class="text-indigo-600">"Kurslar"</strong> sekmesine gidin.</li>
-                <li><strong class="text-indigo-600">"Yeni Kurs Ekle"</strong> butonuna tıklayın.</li>
-                <li>
-                    <strong>Formu Doldurun:</strong>
-                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1 text-sm">
-                        <li><strong>Kurs Adı:</strong> Açık ve net bir isim verin (örn: `Piyano - A (Ali Hoca)`).</li>
-                        <li><strong>Eğitmen:</strong> Dersi verecek eğitmenin adı.</li>
-                        <li><strong>Atanacak Oda:</strong> Bu dersin hangi fiziksel odada yapılacağını (1. Adımda oluşturduğunuz) listeden seçin.</li>
-                        <li><strong>Kontenjan:</strong> Bu sınıfa özel kontenjanı belirleyin. (Bu sayı, odanın fiziksel kapasitesinden büyük olmamalıdır).</li>
-                    </ul>
-                </li>
-                <li class="mt-2">
-                    <strong class="text-red-600">Çok Önemli İpucu:</strong> Eğer aynı saatte, iki farklı odada piyano dersi vermek istiyorsanız, <strong>iki ayrı kurs</strong> oluşturmalısınız:
-                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1 text-sm">
-                        <li>Kurs 1: `Piyano - A`, Oda: `Piyano Odası 1`, Kontenjan: `1`</li>
-                        <li>Kurs 2: `Piyano - B`, Oda: `Piyano Odası 2`, Kontenjan: `1`</li>
-                    </ul>
-                </li>
-            </ol>
-        </section>
-
-        <section class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-700 mb-4">🎓 3. Adım: Öğrenci Yönetimi</h2>
-            
-            <h3 class="text-xl font-semibold text-gray-600 mb-2">Yeni Öğrenci Ekleme</h3>
-            <ol class="list-decimal list-inside space-y-2 mb-6">
-                <li>Sol menüden <strong class="text-indigo-600">"Öğrenciler"</strong> sekmesine gidin.</li>
-                <li><strong class="text-indigo-600">"Yeni Öğrenci Ekle"</strong> butonuna tıklayın.</li>
-                <li>Öğrenci bilgilerini (Ad, Soyad, Telefon) girin.</li>
-                <li><strong class="text-indigo-600">"Kurs (ve Odası)"</strong> listesinden, öğrenciyi kaydetmek istediğiniz sınıfı seçin. (Örn: `Piyano - A (Piyano Odası 1)`).</li>
-                <li>Dönem ücretini, paketindeki ders sayısını (örn: 4) ve sabit ders gün/saatini belirleyin.</li>
-                <li>
-                    <strong class="text-green-600">Kaydet'e bastığınızda ne olur?</strong>
-                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1 text-sm">
-                        <li>Sistem, seçtiğiniz kursun (`Piyano - A`) o gün/saatteki <strong>kurs kontenjanını</strong> kontrol eder.</li>
-                        <li>Sistem, o kursun atanmış olduğu odanın (`Piyano Odası 1`) o gün/saatteki <strong>oda kapasitesini</strong> de kontrol eder.</li>
-                        <li>Herhangi bir çakışma veya limit aşımı varsa kayıt engellenir. Bu sayede hata yapmanız imkansızlaşır.</li>
-                    </ul>
-                </li>
-            </ol>
-
-            <h3 class="text-xl font-semibold text-gray-600 mb-2">Devam Durumu İşleme (Çok Önemli)</h3>
-            <p class="mb-4">Öğrenci listesinden bir öğrencinin ismine tıkladığınızda açılan pencere, ders takibinin kalbidir:</p>
-            <ul class="list-disc list-inside space-y-2">
-                <li><strong class="text-green-600">Geldi:</strong> Öğrenci derse katıldı. Paketten 1 ders hakkı düşer.</li>
-                <li><strong class="text-red-600">Mazeretsiz Gelmedi:</strong> Öğrenci haber vermeden gelmedi. Dersi yanar. Paketten 1 ders hakkı düşer.</li>
-                <li><strong class="text-yellow-600">Mazeretli (İzinli):</strong> Öğrenci (hasta, tatil vb.) haber vererek gelmedi. Dersi yanmaz. Paketten ders hakkı düşmez. Sisteme 1 adet "Kalan Telafi Hakkı" eklenir.</li>
-                <li><strong class="text-blue-600">Telafi Planla:</strong> Sadece "Kalan Telafi Hakkı" olan öğrenciler için aktiftir. Bu butonu kullanarak, mazeretli olduğu dersin telafisini ileri bir tarihe planlayabilirsiniz. Telafi planlandığında 1 telafi hakkı kullanılmış sayılır.</li>
-            </ul>
-        </section>
-
-        <section class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-700 mb-4">💸 4. Adım: Ödeme Takibi</h2>
-            <ul class="list-disc list-inside space-y-2">
-                <li>Sol menüden <strong class="text-indigo-600">"Ödemeler"</strong> sekmesine gidin.</li>
-                <li>Burada tüm öğrencilerinizi ve güncel bakiyelerini görürsünüz.</li>
-                <li>Filtreleri kullanarak "Tüm Ödeme Durumları" yerine <strong class="text-red-600">"Borçlu"</strong> olanları listeleyebilirsiniz.</li>
-                <li>Bir öğrenciden ödeme aldığınızda, satırındaki <strong class="text-yellow-600">"Ödeme Ekle"</strong> butonuna basıp tutarı girmeniz yeterlidir. Bakiye anında güncellenir.</li>
-                <li><strong class="text-green-600">Otomatik Borçlandırma:</strong> Bir öğrenci, paketindeki dersleri (örn: 4/4) tamamladığında ("Geldi" veya "Mazeretsiz Gelmedi" ile), sistem bir sonraki dönemin ücretini bakiyesine otomatik olarak borç yazar.</li>
-            </ul>
-        </section>
-
-        <section>
-            <h2 class="text-2xl font-bold text-gray-700 mb-4">📊 5. Adım: Program ve Rapor Görüntüleme</h2>
-            
-            <h3 class="text-xl font-semibold text-gray-600 mb-2">Ders Programı (Takvim)</h3>
-            <ul class="list-disc list-inside space-y-2 mb-6">
-                <li>Sol menüden <strong class="text-indigo-600">"Ders Programı"</strong> sekmesine gidin.</li>
-                <li>Sağ üstteki <strong class="text-blue-600">"Oda Bazlı Göster"</strong> / <strong class="text-green-600">"Kurs Bazlı Göster"</strong> butonu ile iki görünüm arasında geçiş yapabilirsiniz:
-                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1 text-sm">
-                        <li><strong>Kurs Bazlı Görünüm:</strong> Tüm dersleri tek bir büyük takvimde gösterir. "Kurs Filtresi" ile sadece belirli bir kursu süzebilirsiniz.</li>
-                        <li><strong>Oda Bazlı Görünüm:</strong> Her bir oda için ayrı bir haftalık takvim oluşturur. "Oda Filtresi" ile sadece "Atölye 1"in programına odaklanabilirsiniz.</li>
-                    </ul>
-                </li>
-            </ul>
-
-            <h3 class="text-xl font-semibold text-gray-600 mb-2">Raporlar ve İletişim</h3>
-            <ul class="list-disc list-inside space-y-2">
-                <li>Sol menüden <strong class="text-indigo-600">"Raporlar"</strong> sekmesine giderek işletmenizin finansal ve operasyonel durumunu (gelir, kurs popülerliği, eğitmen yükü vb.) analiz edebilirsiniz.</li>
-                <li><strong class="text-indigo-600">"Öğrenciler"</strong> sayfasındaki <i class="fas fa-print"></i> (Yazdır) ikonu ile öğrencinin tüm bakiye ve devam dökümünü alabilirsiniz.</li>
-                <li><i class="fas fa-paper-plane"></i> (Gönder) ikonu ile bu bilgileri veliye WhatsApp veya E-posta ile hızla iletebilirsiniz.</li>
-            </ul>
-        </section>
-    </div>
-</div>
+                    </div>
 
 
             </main>
