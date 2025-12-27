@@ -8,6 +8,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -26,8 +27,28 @@
         <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
     </div>
 
+
     <div id="login-screen" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 hidden">
+        <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-sm">
+            <h2 id="form-title" class="text-2xl font-bold text-center text-gray-800 mb-6">Yönetici Girişi</h2>
+            <form id="auth-form">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">E-posta Adresi</label>
+                    <input type="email" id="email" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Şifre</label>
+                    <input type="password" id="password" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <button id="auth-submit-btn" type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Giriş Yap</button>
+                <p id="auth-error" class="text-red-500 text-sm mt-2 text-center h-4"></p>
+            </form>
+             <div class="mt-4 text-center hidden">
+                <a href="#" id="auth-toggle-link" class="text-sm text-indigo-600 hover:underline">Hesabınız yok mu? Kayıt Olun.</a>
+            </div>
         </div>
+    </div>
+
 
     <div id="app" class="hidden relative min-h-screen md:flex">
         
@@ -39,33 +60,32 @@
                 <span>Alegori Sanat Evi</span>
             </div>
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                <a href="#dashboard" class="nav-link instructor-only flex items-center px-4 py-2 rounded-md hover:bg-gray-700 active:bg-indigo-600">
+                <a href="#dashboard" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700 active:bg-indigo-600">
                     <i class="fas fa-tachometer-alt w-6 text-center sidebar-icon"></i><span class="ml-3">Ana Sayfa</span>
                 </a>
-                
-                <a href="#students" class="nav-link admin-only flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
+                <a href="#students" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-users w-6 text-center sidebar-icon"></i><span class="ml-3">Öğrenciler</span>
                 </a>
-                <a href="#users" class="nav-link admin-only flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
+                
+                <a href="#users" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-user-shield w-6 text-center sidebar-icon"></i><span class="ml-3">Personel</span>
                 </a>
-                <a href="#courses" class="nav-link admin-only flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
+                <a href="#courses" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-book w-6 text-center sidebar-icon"></i><span class="ml-3">Kurslar</span>
                 </a>
-                <a href="#rooms" class="nav-link admin-only flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
+                <a href="#rooms" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-door-open w-6 text-center sidebar-icon"></i><span class="ml-3">Odalar</span>
                 </a>
-                <a href="#payments" class="nav-link admin-only flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
+                <a href="#payments" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-lira-sign w-6 text-center sidebar-icon"></i><span class="ml-3">Ödemeler</span>
                 </a>
-                <a href="#calendar" class="nav-link admin-only flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
+                <a href="#calendar" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-calendar-alt w-6 text-center sidebar-icon"></i><span class="ml-3">Ders Programı</span>
                 </a>
-                 <a href="#reports" class="nav-link admin-only flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
+                 <a href="#reports" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-chart-pie w-6 text-center sidebar-icon"></i><span class="ml-3">Raporlar</span>
                 </a>
-
-                <a href="#how-to-use" class="nav-link instructor-only flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
+                 <a href="#how-to-use" class="nav-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-question-circle w-6 text-center sidebar-icon"></i><span class="ml-3">Nasıl Kullanılır?</span>
                 </a>
             </nav>
@@ -78,14 +98,52 @@
 
         <div class="flex-1 flex flex-col">
             <header class="md:hidden flex justify-between items-center bg-white p-4 shadow-md">
-                </header>
+                <button id="menu-btn" class="text-gray-700 focus:outline-none">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <h1 class="text-xl font-bold text-gray-800">Alegori Sanat Evi</h1>
+                <div class="w-8"></div>
+            </header>
 
             <main class="flex-1 p-6 md:p-10 overflow-y-auto">
-                
                 <div id="dashboard-page" class="page">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Hoş Geldiniz!</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center">
+                            <i class="fas fa-users text-4xl text-blue-500"></i>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Aktif Öğrenci</p>
+                                <p id="total-students" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center">
+                            <i class="fas fa-book text-4xl text-green-500"></i>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Aktif Kurs</p>
+                                <p id="total-courses" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center">
+                            <i class="fas fa-hand-holding-usd text-4xl text-yellow-500"></i>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Toplam Bakiye</p>
+                                <p id="total-balance" class="text-2xl font-bold text-gray-800">0 ₺</p>
+                            </div>
+                        </div>
+                         <div class="bg-white p-6 rounded-lg shadow-md flex items-center">
+                            <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Borçlu Öğrenci</p>
+                                <p id="students-in-debt" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
                     </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Aktif Kurslar</h2>
+                    <div id="dashboard-courses-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        </div>
+                </div>
 
-                <div id="students-page" class="page admin-only">
+                <div id="students-page" class="page">
                     <div class="flex justify-between items-center mb-6">
                         <h1 class="text-3xl font-bold text-gray-800">Öğrenci Yönetimi</h1>
                         <div class="flex gap-2">
@@ -97,53 +155,284 @@
                             </button>
                         </div>
                     </div>
+                    <div class="bg-white p-4 rounded-lg shadow-md mb-6 flex flex-col md:flex-row gap-4">
+                        <input type="text" id="student-search" placeholder="Öğrenci adıyla ara..." class="flex-grow p-2 border rounded-md">
+                        <select id="student-course-filter" class="p-2 border rounded-md">
+                            <option value="">Tüm Kurslar</option>
+                        </select>
+                        <select id="student-payment-filter" class="p-2 border rounded-md">
+                            <option value="">Tüm Ödeme Durumları</option>
+                            <option value="paid">Borcu Yok</option>
+                            <option value="unpaid">Borçlu</option>
+                        </select>
+                         <select id="student-status-filter" class="p-2 border rounded-md">
+                            <option value="active">Aktif Öğrenciler</option>
+                            <option value="inactive">Pasif Öğrenciler</option>
+                            <option value="all">Tümü</option>
+                        </select>
                     </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Ad Soyad (Katılım)</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Kurs</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Ders Günü/Saati</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Oda</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Bakiye</th>
+                                    <th class="p-4 text-center text-sm font-semibold text-gray-600">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-table-body">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                <div id="users-page" class="page admin-only">
+                <div id="users-page" class="page">
                     <div class="flex justify-between items-center mb-6">
                         <h1 class="text-3xl font-bold text-gray-800">Personel Yönetimi</h1>
                         <button id="add-user-btn" class="bg-teal-600 text-white p-2 md:px-4 md:py-2 rounded-lg shadow hover:bg-teal-700 flex items-center">
                             <i class="fas fa-plus md:mr-2"></i> <span class="hidden md:inline">Yeni Personel Ekle</span>
                         </button>
                     </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+                         <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Ad Soyad</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">E-posta (Giriş)</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Rol</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Telefon</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">İşe Başlama</th>
+                                    <th class="p-4 text-center text-sm font-semibold text-gray-600">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                </tbody>
+                        </table>
                     </div>
-
-                <div id="courses-page" class="page admin-only">
+                </div>
+                <div id="courses-page" class="page">
                      <div class="flex justify-between items-center mb-6">
                         <h1 class="text-3xl font-bold text-gray-800">Kurs Yönetimi</h1>
                         <button id="add-course-btn" class="bg-green-600 text-white p-2 md:px-4 md:py-2 rounded-lg shadow hover:bg-green-700 flex items-center">
                             <i class="fas fa-plus md:mr-2"></i> <span class="hidden md:inline">Yeni Kurs Ekle</span>
                         </button>
                     </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+                         <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Kurs Adı</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Eğitmen</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Oda</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Kontenjan</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Kayıtlı Öğrenci</th>
+                                    <th class="p-4 text-center text-sm font-semibold text-gray-600">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="courses-table-body">
+                                </tbody>
+                        </table>
                     </div>
+                </div>
                 
-                <div id="rooms-page" class="page admin-only">
+                <div id="rooms-page" class="page">
                      <div class="flex justify-between items-center mb-6">
                         <h1 class="text-3xl font-bold text-gray-800">Oda Yönetimi</h1>
                         <button id="add-room-btn" class="bg-blue-600 text-white p-2 md:px-4 md:py-2 rounded-lg shadow hover:bg-blue-700 flex items-center">
                             <i class="fas fa-plus md:mr-2"></i> <span class="hidden md:inline">Yeni Oda Ekle</span>
                         </button>
                     </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+                         <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Oda Adı</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Kapasite (Kişi)</th>
+                                    <th class="p-4 text-center text-sm font-semibold text-gray-600">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rooms-table-body">
+                                </tbody>
+                        </table>
                     </div>
+                </div>
 
-                <div id="payments-page" class="page admin-only">
+                <div id="payments-page" class="page">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Ödeme Takibi</h1>
+                    <div class="bg-white p-4 rounded-lg shadow-md mb-6 flex flex-col md:flex-row gap-4">
+                        <input type="text" id="payment-student-search" placeholder="Öğrenci adıyla ara..." class="flex-grow p-2 border rounded-md">
+                        <select id="payment-course-filter" class="p-2 border rounded-md">
+                            <option value="">Tüm Kurslar</option>
+                        </select>
+                        <select id="payment-status-filter" class="p-2 border rounded-md">
+                            <option value="">Tüm Ödeme Durumları</option>
+                            <option value="unpaid">Borçlu</option>
+                            <option value="paid">Borcu Yok</option>
+                        </select>
                     </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Öğrenci</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Kurs</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Toplam Bakiye</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Durum</th>
+                                    <th class="p-4 text-center text-sm font-semibold text-gray-600">Ödeme Yap</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-table-body">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                <div id="calendar-page" class="page admin-only">
+                <div id="calendar-page" class="page">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h1 class="text-3xl font-bold text-gray-800">Ders Programı</h1>
+                        <div class="flex items-center gap-2 md:gap-4">
+                             <button id="prev-week-btn" title="Önceki Hafta" class="p-2 rounded-md bg-white shadow-sm hover:bg-gray-100"><i class="fas fa-chevron-left"></i></button>
+                             <h2 id="week-range-display" class="text-xl md:text-2xl font-bold text-gray-800 text-center"></h2>
+                             <button id="next-week-btn" title="Sonraki Hafta" class="p-2 rounded-md bg-white shadow-sm hover:bg-gray-100"><i class="fas fa-chevron-right"></i></button>
+                             <button id="today-btn" class="px-3 py-2 text-sm bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700">Bugün</button>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <select id="calendar-course-filter" class="p-2 border rounded-md w-full md:w-48"></select>
+                            <select id="calendar-room-filter" class="p-2 border rounded-md w-full md:w-48 hidden">
+                            </select>
+                            <button id="calendar-view-toggle" data-view="course" class="px-3 py-2 text-sm bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 whitespace-nowrap">
+                                Oda Bazlı Göster
+                            </button>
+                       </div>
                     </div>
+                    
+                    <div id="calendar-view-course">
+                        <div class="bg-white p-2 rounded-lg shadow-md overflow-x-auto">
+                            <div id="calendar-grid" class="grid" style="min-width: 800px;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="calendar-view-room" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    </div>
+                </div>
                 
-                <div id="reports-page" class="page admin-only">
+                <div id="reports-page" class="page">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Raporlama</h1>
+                    
+                    <section class="bg-white p-6 rounded-lg shadow-md mb-8">
+                        <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">Finansal Raporlar</h2>
+                        <div class="flex flex-col md:flex-row gap-4 mb-4">
+                            <div>
+                                <label for="report-start-date" class="block text-sm font-medium text-gray-700">Başlangıç Tarihi</label>
+                                <input type="date" id="report-start-date" class="mt-1 p-2 border rounded-md w-full">
+                            </div>
+                            <div>
+                                <label for="report-end-date" class="block text-sm font-medium text-gray-700">Bitiş Tarihi</label>
+                                <input type="date" id="report-end-date" class="mt-1 p-2 border rounded-md w-full">
+                            </div>
+                            <button id="generate-report-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700 self-end">Raporu Oluştur</button>
+                            <button id="download-report-pdf-btn" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 self-end flex items-center justify-center">
+                                <i class="fas fa-file-pdf mr-2"></i> PDF İndir
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="bg-green-100 p-4 rounded-lg">
+                                <p class="text-sm text-green-800">Toplam Gelir (Seçili Aralık)</p>
+                                <p id="report-total-revenue" class="text-3xl font-bold text-green-900">0 ₺</p>
+                            </div>
+                            <div class="bg-red-100 p-4 rounded-lg">
+                                <p class="text-sm text-red-800">Toplam Alacak (Tüm Aktif Öğrenciler)</p>
+                                <p id="report-total-due" class="text-3xl font-bold text-red-900">0 ₺</p>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">Kursa Göre Gelir Dağılımı (Seçili Aralık)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="p-3 text-left text-sm font-semibold text-gray-600">Kurs</th>
+                                        <th class="p-3 text-left text-sm font-semibold text-gray-600">Toplam Gelir</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-revenue-by-course-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <section class="bg-white p-6 rounded-lg shadow-md">
+                            <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">Öğrenci Raporları</h2>
+                            <h3 class="text-xl font-semibold text-gray-600 mb-2">Aylara Göre Yeni Öğrenci Kayıtları</h3>
+                            <div class="mb-6">
+                                <canvas id="new-students-chart"></canvas>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-600 mb-2">En Çok Devamsızlık Yapanlar (Tüm Zamanlar)</h3>
+                            <div class="overflow-y-auto max-h-60">
+                                 <table class="w-full">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="p-3 text-left text-sm font-semibold text-gray-600">Öğrenci</th>
+                                            <th class="p-3 text-left text-sm font-semibold text-gray-600">Devamsızlık</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="report-absenteeism-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <section class="bg-white p-6 rounded-lg shadow-md">
+                            <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">Operasyonel Raporlar</h2>
+                            <h3 class="text-xl font-semibold text-gray-600 mb-2">Kurs Popülerlik Raporu (Aktif Öğrenci)</h3>
+                            <div class="overflow-y-auto max-h-60 mb-6">
+                                 <table class="w-full">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="p-3 text-left text-sm font-semibold text-gray-600">Kurs</th>
+                                            <th class="p-3 text-left text-sm font-semibold text-gray-600">Öğrenci Sayısı</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="report-course-popularity-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-600 mb-2">Eğitmen Ders Yükü (Aktif Öğrenci)</h3>
+                            <div class="overflow-y-auto max-h-60">
+                                 <table class="w-full">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="p-3 text-left text-sm font-semibold text-gray-600">Eğitmen</th>
+                                            <th class="p-3 text-left text-sm font-semibold text-gray-600">Öğrenci Sayısı</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="report-instructor-workload-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <div id="how-to-use-page" class="page">
                     </div>
 
-                <div id="how-to-use-page" class="page instructor-only">
-                    </div>
 
             </main>
         </div>
     </div>
     
     <div id="modal" class="fixed inset-0 z-40 hidden overflow-y-auto">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="flex items-start justify-center min-h-screen p-4 pt-10 text-center">
+            <div id="modal-content" class="modal-content bg-white p-6 rounded-lg shadow-xl w-full max-w-lg text-left transform transition-all">
+                </div>
         </div>
+    </div>
 
     <div id="print-area" class="hidden"></div>
     
