@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
     const menuBtn = document.getElementById('menu-btn');
     const menuOverlay = document.getElementById('menu-overlay');
+    const mobileBottomNav = document.getElementById('mobile-bottom-nav');
 
     const authForm = document.getElementById('auth-form');
 
@@ -52,6 +53,56 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
+    }
+
+    function normalizeMojibake(value) {
+        if (typeof value !== 'string') return value;
+
+        const replacements = [
+            [/Â/g, ''],
+            [/Ãœ/g, 'Ü'],
+            [/Ã¼/g, 'ü'],
+            [/Ã–/g, 'Ö'],
+            [/Ã¶/g, 'ö'],
+            [/Ã‡/g, 'Ç'],
+            [/Ã§/g, 'ç'],
+            [/Äž/g, 'Ğ'],
+            [/ÄŸ/g, 'ğ'],
+            [/Ä°/g, 'İ'],
+            [/Ä±/g, 'ı'],
+            [/Åž|Å/g, 'Ş'],
+            [/ÅŸ|Å/g, 'ş'],
+            [/â‚º/g, '₺']
+        ];
+
+        return replacements.reduce((text, [pattern, replacement]) => text.replace(pattern, replacement), value);
+    }
+
+    function repairMojibakeInElement(root) {
+        if (!root) return;
+
+        if (root.nodeType === Node.TEXT_NODE) {
+            root.textContent = normalizeMojibake(root.textContent);
+            return;
+        }
+
+        if (root.nodeType !== Node.ELEMENT_NODE) return;
+
+        if (root.hasAttribute('placeholder')) {
+            root.setAttribute('placeholder', normalizeMojibake(root.getAttribute('placeholder')));
+        }
+
+        if (root.hasAttribute('title')) {
+            root.setAttribute('title', normalizeMojibake(root.getAttribute('title')));
+        }
+
+        if (root.tagName === 'INPUT' || root.tagName === 'TEXTAREA' || root.tagName === 'OPTION') {
+            if (root.value) {
+                root.value = normalizeMojibake(root.value);
+            }
+        }
+
+        root.childNodes.forEach(childNode => repairMojibakeInElement(childNode));
     }
 
     function formatCurrency(amount) {
@@ -69,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showGlobalError(message) {
-        globalErrorText.textContent = message;
+        globalErrorText.textContent = normalizeMojibake(message);
         globalErrorBanner.classList.remove('hidden');
     }
 
@@ -82,6 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     globalErrorClose.addEventListener('click', hideGlobalError);
+    document.title = normalizeMojibake(document.title);
+    repairMojibakeInElement(document.body);
 
     function getWeekInfo(d) {
         const date = new Date(d);
@@ -195,6 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'reports': renderReportsPage(); break;
             case 'how-to-use': break;
         }
+
+        repairMojibakeInElement(document.getElementById(`${pageId}-page`));
     }
     
     function renderDashboard() {
@@ -656,7 +711,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- MODAL FONKSİYONLARI ---
     function showModal(content) {
-        modalContent.innerHTML = content;
+        modalContent.innerHTML = normalizeMojibake(content);
+        repairMojibakeInElement(modalContent);
         modal.classList.remove('hidden');
     }
 
@@ -1702,7 +1758,7 @@ function getStudentStatusModalHTML(student) {
     function printStudentInfo(studentId) {
         const printContent = generateStudentInfoHTML(studentId);
         const printArea = document.getElementById('print-area');
-        printArea.innerHTML = printContent;
+        printArea.innerHTML = normalizeMojibake(printContent);
         printArea.classList.remove('hidden');
         window.print();
         printArea.classList.add('hidden');
@@ -1711,6 +1767,9 @@ function getStudentStatusModalHTML(student) {
 
     // --- OLAY DİNLEYİCİLERİ (EVENT LISTENERS) ---
     document.querySelector('aside nav').addEventListener('click', handleNavigation);
+    if (mobileBottomNav) {
+        mobileBottomNav.addEventListener('click', handleNavigation);
+    }
     document.getElementById('add-student-btn').addEventListener('click', () => showModal(getStudentFormHTML()));
     document.getElementById('add-course-btn').addEventListener('click', () => showModal(getCourseFormHTML()));
     document.getElementById('add-room-btn').addEventListener('click', () => showModal(getRoomFormHTML()));
@@ -2042,7 +2101,7 @@ function getStudentStatusModalHTML(student) {
         html += '</tbody></table></div>';
         
         const printArea = document.getElementById('print-area');
-        printArea.innerHTML = html;
+        printArea.innerHTML = normalizeMojibake(html);
         printArea.classList.remove('hidden');
         window.print();
         printArea.classList.add('hidden');
