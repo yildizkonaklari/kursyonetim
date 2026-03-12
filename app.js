@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let viewDate = new Date();
     let newStudentsChartInstance = null;
+    let dataUnsubscribers = [];
     
     // --- DOM ELEMENTLERİ ---
     const pages = document.querySelectorAll('.page');
@@ -41,6 +42,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const authForm = document.getElementById('auth-form');
 
     // --- YARDIMCI FONKSİYONLARI ---
+    function escapeHTML(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function formatCurrency(amount) {
+        return `${Number(amount || 0).toFixed(2)} TL`;
+    }
+
+    function cleanupDataListeners() {
+        dataUnsubscribers.forEach(unsubscribe => unsubscribe());
+        dataUnsubscribers = [];
+    }
+
     function getWeekInfo(d) {
         const date = new Date(d);
         const day = date.getDay();
@@ -67,9 +86,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- VERİ YÖNETİMİ FONKSİYONLARI ---
     function loadData() {
+        cleanupDataListeners();
         loadingOverlay.classList.remove('hidden');
 // *** YENİ: Personel listesini dinle ***
-        db.collection('users').onSnapshot(snapshot => {
+        dataUnsubscribers.push(db.collection('users').onSnapshot(snapshot => {
             state.users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             updateAllSelects();
             renderAllPages();
@@ -77,9 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, error => {
             console.error("Personel verisi alınamadı: ", error);
             loadingOverlay.classList.add('hidden');
-        });
+        }));
         // Kursları dinle
-        db.collection('courses').onSnapshot(snapshot => {
+        dataUnsubscribers.push(db.collection('courses').onSnapshot(snapshot => {
             state.courses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             updateAllSelects();
             renderAllPages();
@@ -87,10 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, error => {
             console.error("Kurs verisi alınamadı: ", error);
             loadingOverlay.classList.add('hidden');
-        });
+        }));
 
         // Odaları dinle
-        db.collection('rooms').onSnapshot(snapshot => {
+        dataUnsubscribers.push(db.collection('rooms').onSnapshot(snapshot => {
             state.rooms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             updateAllSelects();
             renderAllPages();
@@ -98,17 +118,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }, error => {
             console.error("Oda verisi alınamadı: ", error);
             loadingOverlay.classList.add('hidden');
-        });
+        }));
 
         // Öğrencileri dinle
-        db.collection('students').onSnapshot(snapshot => {
+        dataUnsubscribers.push(db.collection('students').onSnapshot(snapshot => {
             state.students = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             renderAllPages();
             loadingOverlay.classList.add('hidden');
         }, error => {
             console.error("Öğrenci verisi alınamadı: ", error);
             loadingOverlay.classList.add('hidden');
-        });
+        }));
     }
 
     function renderAllPages() {
@@ -139,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         switch (pageId) {
             case 'dashboard': renderDashboard(); break;
             case 'students': renderStudentsPage(); break;
+            case 'users': renderUsersPage(); break;
             case 'courses': renderCoursesPage(); break;
             case 'rooms': renderRoomsPage(); break;
             case 'payments': renderPaymentsPage(); break;
@@ -171,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const studentCount = state.students.filter(s => s.courseId === course.id && s.status === 'active').length;
             const card = `
                 <div class="bg-white p-4 rounded-lg shadow-md">
-                    <h3 class="xl font-bold text-gray-800">${course.name}</h3>
+                    <h3 class="xl font-bold text-gray-800">${escapeHTML(course.name)}</h3>
                     <p class="text-gray-600">Eğitmen: ${course.instructor}</p>
                     <div class="mt-4">
                         <div class="flex justify-between items-center text-sm">
@@ -228,12 +249,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = `
                 <tr class="border-b ${isInactive ? 'bg-gray-100 text-gray-500' : ''}">
                     <td class="p-4">
-                        <a href="#" class="student-name-link font-semibold hover:underline ${isInactive ? 'text-gray-500' : 'text-indigo-600'}" data-id="${student.id}">${student.firstName} ${student.lastName}</a>
+                        <a href="#" class="student-name-link font-semibold hover:underline ${isInactive ? 'text-gray-500' : 'text-indigo-600'}" data-id="${student.id}">${escapeHTML(student.firstName)} ${escapeHTML(student.lastName)}</a>
                         <span class="text-sm ml-2">(${attendedCount})</span>
                     </td>
                     <td class="p-4">${course ? course.name : 'Kurs Bulunamadı'}</td>
-                    <td class="p-4">${student.day} / ${student.time}</td>
-                    <td class="p-4">${room ? room.name : 'N/A'}</td>
+                    <td class="p-4">${escapeHTML(student.day)} / ${escapeHTML(student.time)}</td>
+                    <td class="p-4">${room ? escapeHTML(room.name) : 'N/A'}</td>
                     <td class="p-4 font-semibold ${balance < 0 ? 'text-red-600' : 'text-green-600'}">${balance.toFixed(2)} ₺</td>
                     <td class="p-4 text-center">
                         <button class="edit-student-btn text-blue-500 hover:text-blue-700 mr-2" data-id="${student.id}" title="Düzenle"><i class="fas fa-edit"></i></button>
@@ -256,10 +277,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const row = `
                 <tr class="border-b">
-                    <td class="p-4 font-medium">${user.name}</td>
-                    <td class="p-4">${user.email}</td>
+                    <td class="p-4 font-medium">${escapeHTML(user.name)}</td>
+                    <td class="p-4">${escapeHTML(user.email)}</td>
                     <td class="p-4"><span class="px-2 py-1 text-xs font-semibold rounded-full ${roleClass}">${roleText}</span></td>
-                    <td class="p-4">${user.phone || 'N/A'}</td>
+                    <td class="p-4">${escapeHTML(user.phone || 'N/A')}</td>
                     <td class="p-4">${user.startDate ? new Date(user.startDate).toLocaleDateString('tr-TR') : 'N/A'}</td>
                     <td class="p-4 text-center">
                         <button class="edit-user-btn text-blue-500 hover:text-blue-700 mr-2" data-id="${user.id}"><i class="fas fa-edit"></i></button>
@@ -335,9 +356,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const row = `
                 <tr class="border-b">
-                    <td class="p-4 font-medium">${course.name}</td>
+                    <td class="p-4 font-medium">${escapeHTML(course.name)}</td>
                     <td class="p-4">${course.instructorName || 'Atanmamış'}</td>
-                    <td class="p-4">${room ? room.name : 'Oda Yok'}</td>
+                    <td class="p-4">${room ? escapeHTML(room.name) : 'Oda Yok'}</td>
                     <td class="p-4">${course.quota}</td>
                     <td class="p-4">${studentCount}</td>
                     <td class="p-4 text-center">
@@ -356,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.rooms.forEach(room => {
             const row = `
                 <tr class="border-b">
-                    <td class="p-4 font-medium">${room.name}</td>
+                    <td class="p-4 font-medium">${escapeHTML(room.name)}</td>
                     <td class="p-4">${room.capacity}</td>
                     <td class="p-4 text-center">
                         <button class="edit-room-btn text-blue-500 hover:text-blue-700 mr-2" data-id="${room.id}"><i class="fas fa-edit"></i></button>
@@ -399,8 +420,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const row = `
                 <tr class="border-b">
-                    <td class="p-4">${student.firstName} ${student.lastName}</td>
-                    <td class="p-4">${course.name}</td>
+                    <td class="p-4">${escapeHTML(student.firstName)} ${escapeHTML(student.lastName)}</td>
+                    <td class="p-4">${escapeHTML(course.name)}</td>
                     <td class="p-4 font-bold ${balance < 0 ? 'text-red-600' : 'text-green-600'}">${balance.toFixed(2)} ₺</td>
                     <td class="p-4"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">${statusText}</span></td>
                     <td class="p-4 text-center">
@@ -769,12 +790,12 @@ function getCourseFormHTML(course = {}) {
              <h2 class="text-2xl font-bold mb-6">${title}</h2>
              <form id="user-form" data-id="${user.id || ''}">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" name="name" placeholder="Ad Soyad" value="${user.name || ''}" required class="p-2 border rounded">
-                    <input type="email" name="email" placeholder="E-posta (Giriş için)" value="${user.email || ''}" required class="p-2 border rounded">
+                    <input type="text" name="name" placeholder="Ad Soyad" value="${escapeHTML(user.name || '')}" required class="p-2 border rounded">
+                    <input type="email" name="email" placeholder="E-posta (Giriş için)" value="${escapeHTML(user.email || '')}" required class="p-2 border rounded">
                 </div>
                 <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="tel" name="phone" placeholder="Telefon (5XX...)" value="${user.phone || ''}" class="p-2 border rounded">
-                    <input type="date" name="startDate" value="${user.startDate || new Date().toISOString().slice(0,10)}" required class="p-2 border rounded">
+                    <input type="tel" name="phone" placeholder="Telefon (5XX...)" value="${escapeHTML(user.phone || '')}" class="p-2 border rounded">
+                    <input type="date" name="startDate" value="${escapeHTML(user.startDate || new Date().toISOString().slice(0,10))}" required class="p-2 border rounded">
                 </div>
                 <div class="mt-4">
                     <label class="block text-sm font-medium text-gray-700">Rol</label>
@@ -1224,6 +1245,8 @@ function getStudentStatusModalHTML(student) {
         const id = form.dataset.id;
         const formData = new FormData(form);
         const userData = Object.fromEntries(formData.entries());
+        const existingUser = state.users.find(user => user.id === id);
+        const emailChanged = Boolean(id && existingUser && existingUser.email !== userData.email);
 
         // Şifreyi (eğer varsa) Firestore'a kaydetme
         // GÜVENLİK NOTU: Bu, sadece geçici bir adımdır.
@@ -1236,6 +1259,9 @@ function getStudentStatusModalHTML(student) {
         let error = null;
         try {
             if (id) { // Düzenleme
+                if (emailChanged) {
+                    throw new Error("Giris e-postasi degistirme henuz desteklenmiyor.");
+                }
                 await db.collection('users').doc(id).update(userData);
             } else { // Yeni Kayıt
                 // Aşama 2'de burada Auth (createUser) da yapılacak
@@ -1243,7 +1269,18 @@ function getStudentStatusModalHTML(student) {
                 // Not: 'id' kullanmak yerine 'add' kullanmak daha iyi olurdu, ama şimdilik
                 // Auth UID ile eşleşme kolaylığı için ID'yi manuel alabiliriz (veya 'add' sonrası ID'yi Auth'a atayabiliriz)
                 // Şimdilik en basit yöntem:
-                await db.collection('users').add(userData);
+                if (!password) {
+                    throw new Error("Yeni personel icin gecici sifre zorunludur.");
+                }
+
+                const secondaryApp = firebase.apps.find(app => app.name === 'Secondary')
+                    || firebase.initializeApp(firebaseConfig, 'Secondary');
+                const secondaryAuth = secondaryApp.auth();
+                const credential = await secondaryAuth.createUserWithEmailAndPassword(userData.email, password);
+
+                userData.authUid = credential.user.uid;
+                await db.collection('users').doc(credential.user.uid).set(userData);
+                await secondaryAuth.signOut();
             }
         } catch (err) {
             error = err;
@@ -1875,6 +1912,7 @@ function getStudentStatusModalHTML(student) {
             loadData();
             showPage('dashboard');
         } else {
+            cleanupDataListeners();
             appContainer.classList.add('hidden');
             loginScreen.classList.remove('hidden');
             loadingOverlay.classList.add('hidden');
@@ -1983,7 +2021,8 @@ function getStudentStatusModalHTML(student) {
         const reportPage = document.getElementById('reports-page');
         if (!reportPage) return;
         const reportContent = reportPage.cloneNode(true);
-        reportContent.querySelector('button#print-reports-page-btn').remove();
+        const printButton = reportContent.querySelector('button#print-reports-page-btn');
+        if (printButton) printButton.remove();
         const dateFilters = reportContent.querySelector('.flex.flex-col.md\\:flex-row.gap-4.mb-4');
         if(dateFilters) dateFilters.remove();
         
@@ -1992,7 +2031,9 @@ function getStudentStatusModalHTML(student) {
         printArea.appendChild(reportContent);
         
         printArea.classList.remove('hidden');
-        doc.save('kurs_ogrenci_listesi.pdf');
+        window.print();
+        printArea.classList.add('hidden');
+        printArea.innerHTML = '';
     }
 
     function renderReportsPage() {
