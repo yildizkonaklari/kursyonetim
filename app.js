@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modal');
     const modalContent = document.getElementById('modal-content');
     const loadingOverlay = document.getElementById('loading-overlay');
+    const globalErrorBanner = document.getElementById('global-error-banner');
+    const globalErrorText = document.getElementById('global-error-text');
+    const globalErrorClose = document.getElementById('global-error-close');
     
     const sidebar = document.getElementById('sidebar');
     const menuBtn = document.getElementById('menu-btn');
@@ -59,6 +62,26 @@ document.addEventListener('DOMContentLoaded', () => {
         dataUnsubscribers.forEach(unsubscribe => unsubscribe());
         dataUnsubscribers = [];
     }
+
+    function hideGlobalError() {
+        globalErrorBanner.classList.add('hidden');
+        globalErrorText.textContent = '';
+    }
+
+    function showGlobalError(message) {
+        globalErrorText.textContent = message;
+        globalErrorBanner.classList.remove('hidden');
+    }
+
+    function getFirebaseErrorMessage(error, fallbackMessage) {
+        if (!error) return fallbackMessage;
+        if (error.code === 'permission-denied' || String(error.message || '').includes('Missing or insufficient permissions')) {
+            return 'Firestore izni yok. Firebase Console > Firestore Database > Rules tarafinda bu kullaniciya okuma/yazma izni vermeniz gerekiyor.';
+        }
+        return `${fallbackMessage} ${error.message || ''}`.trim();
+    }
+
+    globalErrorClose.addEventListener('click', hideGlobalError);
 
     function getWeekInfo(d) {
         const date = new Date(d);
@@ -87,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- VERİ YÖNETİMİ FONKSİYONLARI ---
     function loadData() {
         cleanupDataListeners();
+        hideGlobalError();
         loadingOverlay.classList.remove('hidden');
 // *** YENİ: Personel listesini dinle ***
         dataUnsubscribers.push(db.collection('users').onSnapshot(snapshot => {
@@ -96,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingOverlay.classList.add('hidden');
         }, error => {
             console.error("Personel verisi alınamadı: ", error);
+            showGlobalError(getFirebaseErrorMessage(error, 'Personel verisi alinamadi.'));
             loadingOverlay.classList.add('hidden');
         }));
         // Kursları dinle
@@ -106,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingOverlay.classList.add('hidden');
         }, error => {
             console.error("Kurs verisi alınamadı: ", error);
+            showGlobalError(getFirebaseErrorMessage(error, 'Kurs verisi alinamadi.'));
             loadingOverlay.classList.add('hidden');
         }));
 
@@ -117,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingOverlay.classList.add('hidden');
         }, error => {
             console.error("Oda verisi alınamadı: ", error);
+            showGlobalError(getFirebaseErrorMessage(error, 'Oda verisi alinamadi.'));
             loadingOverlay.classList.add('hidden');
         }));
 
@@ -127,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingOverlay.classList.add('hidden');
         }, error => {
             console.error("Öğrenci verisi alınamadı: ", error);
+            showGlobalError(getFirebaseErrorMessage(error, 'Ogrenci verisi alinamadi.'));
             loadingOverlay.classList.add('hidden');
         }));
     }
@@ -1177,6 +1205,7 @@ function getStudentStatusModalHTML(student) {
             }
         } catch (error) {
             console.error("Öğrenci kaydedilemedi: ", error);
+            showGlobalError(getFirebaseErrorMessage(error, 'Ogrenci kaydedilemedi.'));
         } finally {
             loadingOverlay.classList.add('hidden');
             hideModal();
@@ -1209,6 +1238,7 @@ function getStudentStatusModalHTML(student) {
             error = err;
             console.error("Kurs kaydedilemedi: ", error);
             document.getElementById('form-error').textContent = "Hata: " + error.message;
+            showGlobalError(getFirebaseErrorMessage(error, 'Kurs kaydedilemedi.'));
         } finally {
             loadingOverlay.classList.add('hidden');
             if (!error) hideModal();
@@ -1234,6 +1264,7 @@ function getStudentStatusModalHTML(student) {
             error = err;
             console.error("Oda kaydedilemedi: ", error);
             document.getElementById('form-error').textContent = "Hata: " + error.message;
+            showGlobalError(getFirebaseErrorMessage(error, 'Oda kaydedilemedi.'));
         } finally {
             loadingOverlay.classList.add('hidden');
             if (!error) hideModal(); // Sadece hata yoksa kapat
@@ -1286,6 +1317,7 @@ function getStudentStatusModalHTML(student) {
             error = err;
             console.error("Personel kaydedilemedi: ", error);
             document.getElementById('form-error').textContent = "Hata: " + error.message;
+            showGlobalError(getFirebaseErrorMessage(error, 'Personel kaydedilemedi.'));
         } finally {
             loadingOverlay.classList.add('hidden');
             if (!error) hideModal();
@@ -1913,6 +1945,7 @@ function getStudentStatusModalHTML(student) {
             showPage('dashboard');
         } else {
             cleanupDataListeners();
+            hideGlobalError();
             appContainer.classList.add('hidden');
             loginScreen.classList.remove('hidden');
             loadingOverlay.classList.add('hidden');
